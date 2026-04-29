@@ -56,7 +56,7 @@ function Task1() {
 
   const handleAnalyze = async () => {
     if (!canAnalyze) {
-      message.warning('请先上传所有4个文件')
+      message.warning('请先上传所有3个文件')
       return
     }
 
@@ -102,15 +102,15 @@ function Task1() {
     <div style={{ padding: 24 }}>
       <Title level={2}>任务1 - 校园认证用户DAU监控</Title>
       
-      <Card title="📁 上传数据文件（共4个）" style={{ marginBottom: 24 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <Card title="📁 上传数据文件" style={{ marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
           <Dragger
             accept=".xlsx,.xls"
             beforeUpload={(file) => { handleFileChange('user_basic', { file }); return false }}
             showUploadList={false}
           >
             <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>1. 用户基本情况</p>
+            <p>用户基本情况</p>
             {files.user_basic && <p style={{ color: 'green' }}>✅ {files.user_basic.name}</p>}
           </Dragger>
           
@@ -120,7 +120,7 @@ function Task1() {
             showUploadList={false}
           >
             <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>2. 内容生产情况</p>
+            <p>内容生产情况</p>
             {files.content_produce && <p style={{ color: 'green' }}>✅ {files.content_produce.name}</p>}
           </Dragger>
           
@@ -130,7 +130,7 @@ function Task1() {
             showUploadList={false}
           >
             <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>3. 累计单校情况</p>
+            <p>累计单校情况</p>
             {files.school_detail && <p style={{ color: 'green' }}>✅ {files.school_detail.name}</p>}
           </Dragger>
           
@@ -140,7 +140,7 @@ function Task1() {
             showUploadList={false}
           >
             <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>4. 蜂巢相关数据</p>
+            <p>蜂巢相关数据</p>
             {files.hive_data && <p style={{ color: 'green' }}>✅ {files.hive_data.name}</p>}
           </Dragger>
         </div>
