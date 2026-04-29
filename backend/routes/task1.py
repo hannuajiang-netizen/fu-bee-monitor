@@ -372,6 +372,8 @@ def generate_weekly_report(df_user: pd.DataFrame, df_content: pd.DataFrame,
         
         # 调试信息
         print(f"DEBUG - 内容生产情况列名: {df_content.columns.tolist()}")
+        print(f"DEBUG - 本周日期范围: {this_week['日期'].min()} 到 {this_week['日期'].max()}, 共 {len(this_week)} 天")
+        print(f"DEBUG - 上周日期范围: {last_week['日期'].min() if not last_week.empty else 'N/A'} 到 {last_week['日期'].max() if not last_week.empty else 'N/A'}, 共 {len(last_week)} 天")
         
         # 日均生产用户数 = 当日发布笔记数的周均（除以实际天数）
         prod_col = find_column(this_week, ['当日发布笔记数', '当日发布笔记量'])
