@@ -39,7 +39,8 @@ function Task1() {
   const [files, setFiles] = useState({
     user_basic: null,
     content_produce: null,
-    school_detail: null
+    school_detail: null,
+    hive_data: null
   })
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
@@ -51,7 +52,7 @@ function Task1() {
     }
   }
 
-  const canAnalyze = files.user_basic && files.content_produce && files.school_detail
+  const canAnalyze = files.user_basic && files.content_produce && files.school_detail && files.hive_data
 
   const handleAnalyze = async () => {
     if (!canAnalyze) {
@@ -64,6 +65,7 @@ function Task1() {
     formData.append('user_basic', files.user_basic.originFileObj || files.user_basic)
     formData.append('content_produce', files.content_produce.originFileObj || files.content_produce)
     formData.append('school_detail', files.school_detail.originFileObj || files.school_detail)
+    formData.append('hive_data', files.hive_data.originFileObj || files.hive_data)
 
     try {
       const response = await axios.post('/api/task1/analyze', formData, {
@@ -130,6 +132,16 @@ function Task1() {
             <p><InboxOutlined style={{ fontSize: 32 }} /></p>
             <p>累计单校情况</p>
             {files.school_detail && <p style={{ color: 'green' }}>✅ {files.school_detail.name}</p>}
+          </Dragger>
+          
+          <Dragger
+            accept=".xlsx,.xls"
+            beforeUpload={(file) => { handleFileChange('hive_data', { file }); return false }}
+            showUploadList={false}
+          >
+            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
+            <p>蜂巢相关数据</p>
+            {files.hive_data && <p style={{ color: 'green' }}>✅ {files.hive_data.name}</p>}
           </Dragger>
         </div>
         

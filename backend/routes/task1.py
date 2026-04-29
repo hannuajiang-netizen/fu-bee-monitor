@@ -49,12 +49,15 @@ def analyze():
         return jsonify({'error': '缺少内容生产情况文件'}), 400
     if 'school_detail' not in request.files:
         return jsonify({'error': '缺少累计单校情况文件'}), 400
+    if 'hive_data' not in request.files:
+        return jsonify({'error': '缺少蜂巢相关数据文件'}), 400
     
     try:
         # 读取文件
         user_basic_file = request.files['user_basic']
         content_produce_file = request.files['content_produce']
         school_detail_file = request.files['school_detail']
+        hive_data_file = request.files['hive_data']
         
         # 保存上传的文件
         upload_dir = f"./uploads/{datetime.now().strftime('%Y-%m-%d')}/task1"
@@ -63,24 +66,29 @@ def analyze():
         user_basic_path = os.path.join(upload_dir, user_basic_file.filename)
         content_produce_path = os.path.join(upload_dir, content_produce_file.filename)
         school_detail_path = os.path.join(upload_dir, school_detail_file.filename)
+        hive_data_path = os.path.join(upload_dir, hive_data_file.filename)
         
         user_basic_file.save(user_basic_path)
         content_produce_file.save(content_produce_path)
         school_detail_file.save(school_detail_path)
+        hive_data_file.save(hive_data_path)
         
         # 读取Excel
         df_user = read_excel_file(open(user_basic_path, 'rb').read())
         df_content = read_excel_file(open(content_produce_path, 'rb').read())
         df_school = read_excel_file(open(school_detail_path, 'rb').read())
+        df_hive = read_excel_file(open(hive_data_path, 'rb').read())
         
         # 标准化列名
         df_user = normalize_columns(df_user)
         df_content = normalize_columns(df_content)
         df_school = normalize_columns(df_school)
+        df_hive = normalize_columns(df_hive)
         
         # 调试：打印列名
         print("DEBUG - 用户基本情况列名:", df_user.columns.tolist())
         print("DEBUG - 内容生产情况列名:", df_content.columns.tolist())
+        print("DEBUG - 蜂巢数据列名:", df_hive.columns.tolist())
         
         # 解析日期
         df_user['日期'] = pd.to_datetime(df_user['日期'])
