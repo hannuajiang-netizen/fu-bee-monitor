@@ -375,18 +375,13 @@ def generate_weekly_report(df_user: pd.DataFrame, df_content: pd.DataFrame,
         print(f"DEBUG - 本周日期范围: {this_week['日期'].min()} 到 {this_week['日期'].max()}, 共 {len(this_week)} 天")
         print(f"DEBUG - 上周日期范围: {last_week['日期'].min() if not last_week.empty else 'N/A'} 到 {last_week['日期'].max() if not last_week.empty else 'N/A'}, 共 {len(last_week)} 天")
         
-        # 日均生产用户数 = 当日发布笔记数的周均（除以实际天数）
+        # 日均生产用户数 = 当日发布笔记数的周均（固定除以7天，与其他指标保持一致）
         prod_col = find_column(this_week, ['当日发布笔记数', '当日发布笔记量'])
-        print(f"DEBUG - 找到的列名: {prod_col}")
         if prod_col:
             this_sum = this_week[prod_col].sum()
             last_sum = last_week[prod_col].sum() if not last_week.empty else 0
-            this_days = len(this_week) if not this_week.empty else 7
-            last_days = len(last_week) if not last_week.empty else 7
-            this_avg_prod = int(this_sum / this_days) if this_days > 0 else 0
-            last_avg_prod = int(last_sum / last_days) if last_days > 0 else 0
-            print(f"DEBUG - 本周{prod_col}总和: {this_sum}, 天数: {this_days}, 日均: {this_avg_prod}")
-            print(f"DEBUG - 上周{prod_col}总和: {last_sum}, 天数: {last_days}, 日均: {last_avg_prod}")
+            this_avg_prod = int(this_sum / 7) if not this_week.empty else 0
+            last_avg_prod = int(last_sum / 7) if not last_week.empty else 0
             report_lines.append(f"日均生产用户数 {this_avg_prod}（上周 {last_avg_prod}）")
     
     # 累计单校情况相关指标
