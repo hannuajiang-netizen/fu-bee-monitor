@@ -1,0 +1,202 @@
+from flask import Blueprint, request, jsonify
+import pandas as pd
+import io
+import os
+from datetime import datetime
+from utils.excel_parser import read_excel_file, normalize_columns, format_percentage, format_number
+from utils.calculator import calculate_weekly_metrics
+
+task1_bp = Blueprint('task1', __name__)
+
+# 25个字段的定义
+TASK1_COLUMNS = [
+    ('日期', '用户基本情况'),
+    ('活跃用户数', '用户基本情况'),
+    ('人均停留时长(分钟)', '用户基本情况'),
+    ('互动次数', '用户基本情况'),
+    ('互动人数', '用户基本情况'),
+    ('互动人数占比', '用户基本情况'),
+    ('分享人数', '用户基本情况'),
+    ('关注人数', '用户基本情况'),
+    ('次日留存率', '用户基本情况'),
+    ('3留率', '用户基本情况'),
+    ('7留率', '用户基本情况'),
+    ('14留率', '用户基本情况'),
+    ('30日留率', '用户基本情况'),
+    ('当日发布笔记量', '内容生产情况'),
+    ('当日发布笔记用户数', '内容生产情况'),
+    ('累计发布笔记量', '内容生产情况'),
+    ('累计发布笔记用户数', '内容生产情况'),
+    ('活跃在群用户数', '用户基本情况'),
+    ('群活跃用户数', '用户基本情况'),
+    ('群发言用户数', '用户基本情况'),
+    ('活跃在蜂巢用户数', '用户基本情况'),
+    ('蜂巢活跃用户数', '用户基本情况'),
+    ('发布蜂巢笔记用户数', '用户基本情况或内容生产情况'),
+    ('预留1', '—'),
+    ('预留2', '—'),
+]
+
+
+@task1_bp.route('/analyze', methods=['POST'])
+def analyze():
+    """任务一：校园认证用户DAU监控分析"""
+    
+    # 检查文件
+    if 'user_basic' not in request.files:
+        return jsonify({'error': '缺少用户基本情况文件'}), 400
+    if 'content_produce' not in request.files:
+        return jsonify({'error': '缺少内容生产情况文件'}), 400
+    if 'school_detail' not in request.files:
+        return jsonify({'error': '缺少累计单校情况文件'}), 400
+    
+    try:
+        # 读取文件
+        user_basic_file = request.files['user_basic']
+        content_produce_file = request.files['content_produce']
+        school_detail_file = request.files['school_detail']
+        
+        # 保存上传的文件
+        upload_dir = f"./uploads/{datetime.now().strftime('%Y-%m-%d')}/task1"
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        user_basic_path = os.path.join(upload_dir, user_basic_file.filename)
+        content_produce_path = os.path.join(upload_dir, content_produce_file.filename)
+        school_detail_path = os.path.join(upload_dir, school_detail_file.filename)
+        
+        user_basic_file.save(user_basic_path)
+        content_produce_file.save(content_produce_path)
+        school_detail_file.save(school_detail_path)
+        
+        # 读取Excel
+        df_user = read_excel_file(open(user_basic_path, 'rb').read())
+        df_content = read_excel_file(open(content_produce_path, 'rb').read())
+        df_school = read_excel_file(open(school_detail_path, 'rb').read())
+        
+        # 标准化列名
+        df_user = normalize_columns(df_user)
+        df_content = normalize_columns(df_content)
+        df_school = normalize_columns(df_school)
+        
+        # 解析日期
+        df_user['日期'] = pd.to_datetime(df_user['日期'])
+        df_content['日期'] = pd.to_datetime(df_content['日期'])
+        
+        # 生成14天汇总表
+        summary_table = generate_summary_table(df_user, df_content)
+        
+        # 生成周报文本
+        weekly_report = generate_weekly_report(df_user, df_content, df_school)
+        
+        return jsonify({
+            'success': True,
+            'summary_table': summary_table,
+            'weekly_report': weekly_report
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> list:
+    """生成近14天汇总表"""
+    
+    # 合并数据
+    merged = df_user.merge(df_content, on='日期', how='left', suffixes=('', '_c'))
+    merged = merged.sort_values('日期', ascending=False)
+    
+    # 取近14天
+    latest_date = merged['日期'].max()
+    date_14_days_ago = latest_date - pd.Timedelta(days=13)
+    recent_data = merged[merged['日期'] >= date_14_days_ago]
+    recent_data = recent_data.sort_values('日期', ascending=True)
+    
+    # 构建结果
+    result = []
+    for _, row in recent_data.iterrows():
+        record = {}
+        
+        # 日期
+        record['日期'] = row['日期'].strftime('%Y-%m-%d')
+        
+        # 从用户基本情况获取的字段
+        user_fields = [
+            '活跃用户数', '人均停留时长(分钟)', '互动次数', '互动人数',
+            '互动人数占比', '分享人数', '关注人数', '次日留存率', '3留率',
+            '7留率', '14留率', '30日留率', '活跃在群用户数', '群活跃用户数',
+            '群发言用户数', '活跃在蜂巢用户数', '蜂巢活跃用户数'
+        ]
+        
+        for field in user_fields:
+            if field in row:
+                value = row[field]
+                if pd.isna(value):
+                    record[field] = '⚠️ 数据缺失'
+                elif '率' in field or '占比' in field:
+                    # 百分比处理
+                    if isinstance(value, (int, float)):
+                        if value <= 1:
+                            value = value * 100
+                        record[field] = f"{value:.2f}%"
+                    else:
+                        record[field] = str(value)
+                else:
+                    # 数值处理
+                    if isinstance(value, (int, float)):
+                        record[field] = str(int(value)) if isinstance(value, (int, float)) and value == int(value) else str(value)
+                    else:
+                        record[field] = str(value).replace(',', '')
+            else:
+                record[field] = '⚠️ 数据缺失'
+        
+        # 从内容生产情况获取的字段
+        content_fields = [
+            '当日发布笔记量', '当日发布笔记用户数',
+            '累计发布笔记量', '累计发布笔记用户数'
+        ]
+        
+        for field in content_fields:
+            col_name = field + '_c' if field + '_c' in row else field
+            if col_name in row:
+                value = row[col_name]
+                if pd.isna(value):
+                    record[field] = '⚠️ 数据缺失'
+                else:
+                    record[field] = str(int(value)) if isinstance(value, (int, float)) and value == int(value) else str(value).replace(',', '')
+            else:
+                record[field] = '⚠️ 数据缺失'
+        
+        # 发布蜂巢笔记用户数
+        if '发布蜂巢笔记用户数' in row:
+            value = row['发布蜂巢笔记用户数']
+            record['发布蜂巢笔记用户数'] = str(int(value)) if not pd.isna(value) else '⚠️ 数据缺失'
+        else:
+            record['发布蜂巢笔记用户数'] = '⚠️ 数据缺失'
+        
+        # 预留字段
+        record['预留1'] = ''
+        record['预留2'] = ''
+        
+        result.append(record)
+    
+    return result
+
+
+def generate_weekly_report(df_user: pd.DataFrame, df_content: pd.DataFrame, 
+                          df_school: pd.DataFrame) -> str:
+    """生成周报结论文本"""
+    
+    metrics = calculate_weekly_metrics(df_user, df_content, df_school)
+    
+    school_diff = metrics['this_school_count'] - metrics['last_school_count']
+    school_diff_str = f"+{school_diff}" if school_diff >= 0 else f"{school_diff}"
+    
+    report = f"""近一周（{metrics['date_start']}-{metrics['date_end']}）
+日均活跃校园认证用户 {metrics['this_avg_dau']}（上周 {metrics['last_avg_dau']}）
+人均消费时长 {metrics['this_avg_dur']} min（上周 {metrics['last_avg_dur']}）
+次留 {metrics['this_avg_ret']}%（上周 {metrics['last_avg_ret']}%）
+日均生产用户数 {metrics['this_avg_prod']}（上周 {metrics['last_avg_prod']}）
+日均消费用户数 {metrics['this_avg_cons']}（上周 {metrics['last_avg_cons']}）
+覆盖 {metrics['this_school_count']} 所高校（{school_diff_str}）"""
+    
+    return report
