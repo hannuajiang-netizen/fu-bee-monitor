@@ -4,7 +4,7 @@ import io
 import os
 from datetime import datetime
 from utils.excel_parser import read_excel_file, normalize_columns, format_percentage, format_number, find_column
-from utils.calculator import calculate_weekly_metrics
+from utils.calculator import calculate_weekly_metrics, calculate_school_count
 
 task1_bp = Blueprint('task1', __name__)
 
