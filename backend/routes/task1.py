@@ -42,65 +42,72 @@ TASK1_COLUMNS = [
 def analyze():
     """任务一：校园认证用户DAU监控分析"""
     
-    # 检查文件
-    if 'user_basic' not in request.files:
-        return jsonify({'error': '缺少用户基本情况文件'}), 400
-    if 'content_produce' not in request.files:
-        return jsonify({'error': '缺少内容生产情况文件'}), 400
-    if 'school_detail' not in request.files:
-        return jsonify({'error': '缺少累计单校情况文件'}), 400
-    if 'hive_data' not in request.files:
-        return jsonify({'error': '缺少蜂巢相关数据文件'}), 400
+    # 检查文件（支持单个或多个文件上传）
+    has_user_basic = 'user_basic' in request.files
+    has_content_produce = 'content_produce' in request.files
+    has_school_detail = 'school_detail' in request.files
+    has_hive_data = 'hive_data' in request.files
+    
+    if not (has_user_basic or has_content_produce or has_school_detail or has_hive_data):
+        return jsonify({'error': '请至少上传1个文件'}), 400
     
     try:
-        # 读取文件
-        user_basic_file = request.files['user_basic']
-        content_produce_file = request.files['content_produce']
-        school_detail_file = request.files['school_detail']
-        hive_data_file = request.files['hive_data']
-        
         # 保存上传的文件
         upload_dir = f"./uploads/{datetime.now().strftime('%Y-%m-%d')}/task1"
         os.makedirs(upload_dir, exist_ok=True)
         
-        user_basic_path = os.path.join(upload_dir, user_basic_file.filename)
-        content_produce_path = os.path.join(upload_dir, content_produce_file.filename)
-        school_detail_path = os.path.join(upload_dir, school_detail_file.filename)
-        hive_data_path = os.path.join(upload_dir, hive_data_file.filename)
+        # 初始化空的DataFrame
+        df_user = pd.DataFrame()
+        df_content = pd.DataFrame()
+        df_school = pd.DataFrame()
+        df_hive = pd.DataFrame()
         
-        user_basic_file.save(user_basic_path)
-        content_produce_file.save(content_produce_path)
-        school_detail_file.save(school_detail_path)
-        hive_data_file.save(hive_data_path)
+        # 读取用户基本情况文件
+        if has_user_basic:
+            user_basic_file = request.files['user_basic']
+            user_basic_path = os.path.join(upload_dir, user_basic_file.filename)
+            user_basic_file.save(user_basic_path)
+            df_user = read_excel_file(open(user_basic_path, 'rb').read())
+            df_user = normalize_columns(df_user)
+            if '日期' in df_user.columns:
+                df_user['日期'] = pd.to_datetime(df_user['日期'])
         
-        # 读取Excel
-        df_user = read_excel_file(open(user_basic_path, 'rb').read())
-        df_content = read_excel_file(open(content_produce_path, 'rb').read())
-        df_school = read_excel_file(open(school_detail_path, 'rb').read())
-        df_hive = read_excel_file(open(hive_data_path, 'rb').read())
+        # 读取内容生产情况文件
+        if has_content_produce:
+            content_produce_file = request.files['content_produce']
+            content_produce_path = os.path.join(upload_dir, content_produce_file.filename)
+            content_produce_file.save(content_produce_path)
+            df_content = read_excel_file(open(content_produce_path, 'rb').read())
+            df_content = normalize_columns(df_content)
+            if '日期' in df_content.columns:
+                df_content['日期'] = pd.to_datetime(df_content['日期'])
         
-        # 标准化列名
-        df_user = normalize_columns(df_user)
-        df_content = normalize_columns(df_content)
-        df_school = normalize_columns(df_school)
-        df_hive = normalize_columns(df_hive)
+        # 读取累计单校情况文件
+        if has_school_detail:
+            school_detail_file = request.files['school_detail']
+            school_detail_path = os.path.join(upload_dir, school_detail_file.filename)
+            school_detail_file.save(school_detail_path)
+            df_school = read_excel_file(open(school_detail_path, 'rb').read())
+            df_school = normalize_columns(df_school)
+        
+        # 读取蜂巢相关数据文件
+        if has_hive_data:
+            hive_data_file = request.files['hive_data']
+            hive_data_path = os.path.join(upload_dir, hive_data_file.filename)
+            hive_data_file.save(hive_data_path)
+            df_hive = read_excel_file(open(hive_data_path, 'rb').read())
+            df_hive = normalize_columns(df_hive)
+            # 蜂巢数据可能使用 'day' 或 '日期' 作为日期列名
+            if 'day' in df_hive.columns:
+                df_hive = df_hive.rename(columns={'day': '日期'})
+                df_hive['日期'] = pd.to_datetime(df_hive['日期'])
+            elif '日期' in df_hive.columns:
+                df_hive['日期'] = pd.to_datetime(df_hive['日期'])
         
         # 调试：打印列名
-        print("DEBUG - 用户基本情况列名:", df_user.columns.tolist())
-        print("DEBUG - 内容生产情况列名:", df_content.columns.tolist())
-        print("DEBUG - 蜂巢数据列名:", df_hive.columns.tolist())
-        
-        # 解析日期
-        df_user['日期'] = pd.to_datetime(df_user['日期'])
-        df_content['日期'] = pd.to_datetime(df_content['日期'])
-        
-        # 解析蜂巢数据日期（如果有日期列）
-        # 蜂巢数据可能使用 'day' 或 '日期' 作为日期列名
-        if 'day' in df_hive.columns:
-            df_hive = df_hive.rename(columns={'day': '日期'})
-            df_hive['日期'] = pd.to_datetime(df_hive['日期'])
-        elif '日期' in df_hive.columns:
-            df_hive['日期'] = pd.to_datetime(df_hive['日期'])
+        print("DEBUG - 用户基本情况列名:", df_user.columns.tolist() if not df_user.empty else "未上传")
+        print("DEBUG - 内容生产情况列名:", df_content.columns.tolist() if not df_content.empty else "未上传")
+        print("DEBUG - 蜂巢数据列名:", df_hive.columns.tolist() if not df_hive.empty else "未上传")
         
         # 生成14天汇总表
         summary_table = generate_summary_table(df_user, df_content, df_hive)
@@ -125,14 +132,32 @@ def analyze():
 
 
 def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame, df_hive: pd.DataFrame = None) -> list:
-    """生成近14天汇总表"""
+    """生成近14天汇总表（支持可选的数据文件）"""
     
-    # 合并数据
-    merged = df_user.merge(df_content, on='日期', how='left', suffixes=('', '_c'))
+    # 确定使用哪个DataFrame作为主数据源
+    if not df_user.empty:
+        merged = df_user.copy()
+    elif not df_content.empty:
+        merged = df_content.copy()
+    elif df_hive is not None and not df_hive.empty:
+        merged = df_hive.copy()
+    else:
+        return []
+    
+    # 合并内容生产数据（如果有）
+    if not df_content.empty and '日期' in df_content.columns:
+        if '日期' in merged.columns:
+            merged = merged.merge(df_content, on='日期', how='left', suffixes=('', '_c'))
+        else:
+            # 如果主数据没有日期列，尝试用行索引合并
+            merged = pd.concat([merged, df_content], axis=1)
     
     # 合并蜂巢数据（如果有）
-    if df_hive is not None and '日期' in df_hive.columns:
-        merged = merged.merge(df_hive, on='日期', how='left', suffixes=('', '_hive'))
+    if df_hive is not None and not df_hive.empty and '日期' in df_hive.columns:
+        if '日期' in merged.columns:
+            merged = merged.merge(df_hive, on='日期', how='left', suffixes=('', '_hive'))
+        else:
+            merged = pd.concat([merged, df_hive], axis=1)
     merged = merged.sort_values('日期', ascending=False)
     
     # 取近14天
@@ -276,19 +301,85 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame, df_h
 
 def generate_weekly_report(df_user: pd.DataFrame, df_content: pd.DataFrame, 
                           df_school: pd.DataFrame) -> str:
-    """生成周报结论文本"""
+    """生成周报结论文本（根据上传的文件动态生成）"""
     
-    metrics = calculate_weekly_metrics(df_user, df_content, df_school)
+    # 检查哪些数据文件已上传
+    has_user = not df_user.empty
+    has_content = not df_content.empty
+    has_school = not df_school.empty
     
-    school_diff = metrics['this_school_count'] - metrics['last_school_count']
-    school_diff_str = f"+{school_diff}" if school_diff >= 0 else f"{school_diff}"
+    # 如果没有上传任何文件，返回提示
+    if not has_user and not has_content and not has_school:
+        return "未上传任何数据文件，无法生成周报。"
     
-    report = f"""近一周（{metrics['date_start']}-{metrics['date_end']}）
-日均活跃校园认证用户 {metrics['this_avg_dau']}（上周 {metrics['last_avg_dau']}）
-人均消费时长 {metrics['this_avg_dur']} min（上周 {metrics['last_avg_dur']}）
-次留 {metrics['this_avg_ret']}%（上周 {metrics['last_avg_ret']}%）
-日均生产用户数 {metrics['this_avg_prod']}（上周 {metrics['last_avg_prod']}）
-日均消费用户数 {metrics['this_avg_cons']}（上周 {metrics['last_avg_cons']}）
-覆盖 {metrics['this_school_count']} 所高校（{school_diff_str}）"""
+    # 获取日期范围
+    if has_user:
+        latest_date = df_user['日期'].max()
+        this_week_start = latest_date - pd.Timedelta(days=6)
+        date_start = this_week_start.strftime('%m.%d')
+        date_end = latest_date.strftime('%m.%d')
+    elif has_content:
+        latest_date = df_content['日期'].max()
+        this_week_start = latest_date - pd.Timedelta(days=6)
+        date_start = this_week_start.strftime('%m.%d')
+        date_end = latest_date.strftime('%m.%d')
+    else:
+        date_start = "--"
+        date_end = "--"
     
-    return report
+    report_lines = [f"近一周（{date_start}-{date_end}）"]
+    
+    # 用户基本情况相关指标
+    if has_user:
+        this_week = df_user[df_user['日期'] >= (df_user['日期'].max() - pd.Timedelta(days=6))]
+        last_week = df_user[(df_user['日期'] >= (df_user['日期'].max() - pd.Timedelta(days=13))) & 
+                           (df_user['日期'] < (df_user['日期'].max() - pd.Timedelta(days=6)))]
+        
+        # 日均活跃用户数
+        this_avg_dau = int(this_week['活跃用户数'].sum() / 7) if not this_week.empty else 0
+        last_avg_dau = int(last_week['活跃用户数'].sum() / 7) if not last_week.empty else 0
+        report_lines.append(f"日均活跃校园认证用户 {this_avg_dau}（上周 {last_avg_dau}）")
+        
+        # 人均消费时长
+        dur_col = find_column(this_week, ['人均停留时长[分钟]', '人均停留时长(分钟)', '人均停留时长'])
+        if dur_col:
+            this_avg_dur = round(this_week[dur_col].mean(), 2) if not this_week.empty else 0
+            last_avg_dur = round(last_week[dur_col].mean(), 2) if not last_week.empty else 0
+            report_lines.append(f"人均消费时长 {this_avg_dur} min（上周 {last_avg_dur}）")
+        
+        # 次留
+        if '次日留存率' in this_week.columns:
+            this_ret = this_week['次日留存率'].mean()
+            last_ret = last_week['次日留存率'].mean() if not last_week.empty else 0
+            if this_ret <= 1:
+                this_ret = this_ret * 100
+            if last_ret <= 1:
+                last_ret = last_ret * 100
+            report_lines.append(f"次留 {round(this_ret, 2)}%（上周 {round(last_ret, 2)}%）")
+        
+        # 日均消费用户数 = 互动人数的周均
+        cons_col = find_column(this_week, ['互动人数'])
+        if cons_col:
+            this_avg_cons = int(this_week[cons_col].sum() / 7) if not this_week.empty else 0
+            last_avg_cons = int(last_week[cons_col].sum() / 7) if not last_week.empty else 0
+            report_lines.append(f"日均消费用户数 {this_avg_cons}（上周 {last_avg_cons}）")
+    
+    # 内容生产情况相关指标
+    if has_content:
+        this_week = df_content[df_content['日期'] >= (df_content['日期'].max() - pd.Timedelta(days=6))]
+        last_week = df_content[(df_content['日期'] >= (df_content['日期'].max() - pd.Timedelta(days=13))) & 
+                              (df_content['日期'] < (df_content['日期'].max() - pd.Timedelta(days=6)))]
+        
+        # 日均生产用户数 = 当日发布笔记数的周均
+        prod_col = find_column(this_week, ['当日发布笔记数', '当日发布笔记量'])
+        if prod_col:
+            this_avg_prod = int(this_week[prod_col].sum() / 7) if not this_week.empty else 0
+            last_avg_prod = int(last_week[prod_col].sum() / 7) if not last_week.empty else 0
+            report_lines.append(f"日均生产用户数 {this_avg_prod}（上周 {last_avg_prod}）")
+    
+    # 累计单校情况相关指标
+    if has_school:
+        school_count = calculate_school_count(df_school)
+        report_lines.append(f"覆盖 {school_count} 所高校")
+    
+    return "\n".join(report_lines)

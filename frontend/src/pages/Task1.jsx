@@ -52,20 +52,31 @@ function Task1() {
     }
   }
 
-  const canAnalyze = files.user_basic && files.content_produce && files.school_detail && files.hive_data
+  // 支持单个或多个文件上传，至少上传1个文件即可分析
+  const canAnalyze = files.user_basic || files.content_produce || files.school_detail || files.hive_data
 
   const handleAnalyze = async () => {
     if (!canAnalyze) {
-      message.warning('请先上传所有4个文件')
+      message.warning('请至少上传1个文件')
       return
     }
 
     setLoading(true)
     const formData = new FormData()
-    formData.append('user_basic', files.user_basic.originFileObj || files.user_basic)
-    formData.append('content_produce', files.content_produce.originFileObj || files.content_produce)
-    formData.append('school_detail', files.school_detail.originFileObj || files.school_detail)
-    formData.append('hive_data', files.hive_data.originFileObj || files.hive_data)
+    
+    // 只添加已上传的文件
+    if (files.user_basic) {
+      formData.append('user_basic', files.user_basic.originFileObj || files.user_basic)
+    }
+    if (files.content_produce) {
+      formData.append('content_produce', files.content_produce.originFileObj || files.content_produce)
+    }
+    if (files.school_detail) {
+      formData.append('school_detail', files.school_detail.originFileObj || files.school_detail)
+    }
+    if (files.hive_data) {
+      formData.append('hive_data', files.hive_data.originFileObj || files.hive_data)
+    }
 
     try {
       const response = await axios.post('/api/task1/analyze', formData, {
@@ -187,8 +198,21 @@ function Task1() {
             />
           </Card>
 
-          <Card title="周报结论文本">
-            <pre style={{ background: '#f5f5f5', padding: 16, fontFamily: 'monospace' }}>
+          <Card 
+            title="周报结论文本"
+            extra={
+              <Button 
+                icon={<CopyOutlined />} 
+                onClick={() => {
+                  navigator.clipboard.writeText(result.weekly_report)
+                  message.success('周报文本已复制')
+                }}
+              >
+                复制文本
+              </Button>
+            }
+          >
+            <pre style={{ background: '#f5f5f5', padding: 16, fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
               {result.weekly_report}
             </pre>
           </Card>

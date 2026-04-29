@@ -21,24 +21,33 @@ def calculate_weighted_average(df: pd.DataFrame, value_col: str, weight_col: str
 def calculate_school_count(df_school: pd.DataFrame, period: str = 'this_week') -> int:
     """
     从「累计单校情况」表中计算覆盖高校数
-    =0、>0、>=15、>=100 四个区间的学校数量之和
+    取最新日期的所有学校数据汇总（去重计数）
     """
     if df_school.empty:
         return 0
     
-    # 假设表中有「单校活跃人数分布」相关列
-    # 这里需要根据实际Excel结构调整
-    count = 0
-    
-    # 查找包含学校数的列
+    # 查找学校名称/ID列
+    school_col = None
     for col in df_school.columns:
         col_lower = col.lower()
-        if any(keyword in col_lower for keyword in ['学校', '高校', '院校', 'school']):
-            if '分布' in col or '区间' in col or '数量' in col:
-                # 累加所有值
-                count += df_school[col].sum()
+        if any(keyword in col_lower for keyword in ['学校', '高校', '院校', 'school', '大学', '学院']):
+            if '名称' in col or 'id' in col_lower or '编号' in col:
+                school_col = col
+                break
     
-    return int(count)
+    if school_col:
+        # 取最新日期
+        if '日期' in df_school.columns:
+            latest_date = df_school['日期'].max()
+            latest_data = df_school[df_school['日期'] == latest_date]
+            # 去重计数
+            return int(latest_data[school_col].nunique())
+        else:
+            # 如果没有日期列，直接统计所有学校
+            return int(df_school[school_col].nunique())
+    else:
+        # 如果没有找到学校列，返回行数（假设每行一个学校）
+        return int(len(df_school))
 
 
 def get_week_boundaries(df: pd.DataFrame, date_col: str = '日期') -> Tuple[pd.Timestamp, pd.Timestamp, pd.Timestamp, pd.Timestamp]:
@@ -99,18 +108,23 @@ def calculate_weekly_metrics(df_user: pd.DataFrame, df_content: pd.DataFrame,
     metrics['this_avg_ret'] = calc_retention_rate(this_week)
     metrics['last_avg_ret'] = calc_retention_rate(last_week)
     
-    # 日均生产用户数 = 7天「当日发布笔记用户数」合计 / 7
-    content_col = '当日发布笔记用户数'
-    if content_col in this_week.columns:
-        metrics['this_avg_prod'] = int(this_week[content_col].sum() / 7)
-        metrics['last_avg_prod'] = int(last_week[content_col].sum() / 7) if not last_week.empty else 0
+    # 日均生产用户数 = 7天「当日发布笔记数」合计 / 7（注意：是笔记数，不是用户数）
+    prod_col = find_column(this_week, ['当日发布笔记数', '当日发布笔记量'])
+    if prod_col:
+        metrics['this_avg_prod'] = int(this_week[prod_col].sum() / 7) if not this_week.empty else 0
+        metrics['last_avg_prod'] = int(last_week[prod_col].sum() / 7) if not last_week.empty else 0
     else:
         metrics['this_avg_prod'] = 0
         metrics['last_avg_prod'] = 0
     
-    # 日均消费用户数 = 日均活跃用户数
-    metrics['this_avg_cons'] = metrics['this_avg_dau']
-    metrics['last_avg_cons'] = metrics['last_avg_dau']
+    # 日均消费用户数 = 7天「互动人数」合计 / 7
+    cons_col = find_column(this_week, ['互动人数'])
+    if cons_col:
+        metrics['this_avg_cons'] = int(this_week[cons_col].sum() / 7) if not this_week.empty else 0
+        metrics['last_avg_cons'] = int(last_week[cons_col].sum() / 7) if not last_week.empty else 0
+    else:
+        metrics['this_avg_cons'] = 0
+        metrics['last_avg_cons'] = 0
     
     # 覆盖高校数
     metrics['this_school_count'] = calculate_school_count(df_school, 'this_week')
