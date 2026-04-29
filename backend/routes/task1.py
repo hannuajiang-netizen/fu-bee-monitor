@@ -176,25 +176,27 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> l
             else:
                 record[output_name] = '⚠️ 数据缺失'
         
-        # 从内容生产情况获取的字段
+        # 从内容生产情况获取的字段（输出字段名已修改：量->数，用户数->人数）
         content_field_mappings = {
-            '当日发布笔记量': ['当日发布笔记量', '发布笔记量'],
-            '当日发布笔记用户数': ['当日发布笔记用户数', '发布笔记用户数'],
-            '累计发布笔记量': ['累计发布笔记量'],
-            '累计发布笔记用户数': ['累计发布笔记用户数']
+            '当日发布笔记数': {'input': ['当日发布笔记数', '当日发布笔记量', '发布笔记数', '发布笔记量'], 'output': '当日发布笔记数'},
+            '当日发布笔记人数': {'input': ['当日发布笔记人数', '当日发布笔记用户数', '发布笔记人数', '发布笔记用户数'], 'output': '当日发布笔记人数'},
+            '累计发布笔记数': {'input': ['累计发布笔记数', '累计发布笔记量'], 'output': '累计发布笔记数'},
+            '累计发布笔记人数': {'input': ['累计发布笔记人数', '累计发布笔记用户数'], 'output': '累计发布笔记人数'}
         }
         
-        for field, possible_names in content_field_mappings.items():
+        for field, mapping in content_field_mappings.items():
+            possible_names = mapping['input']
+            output_name = mapping['output']
             actual_col = find_column(df_content, possible_names)
             col_name = actual_col + '_c' if actual_col and actual_col + '_c' in row else actual_col
             if col_name and col_name in row:
                 value = row[col_name]
                 if pd.isna(value):
-                    record[field] = '⚠️ 数据缺失'
+                    record[output_name] = '⚠️ 数据缺失'
                 else:
-                    record[field] = str(int(value)) if isinstance(value, (int, float)) and value == int(value) else str(value).replace(',', '')
+                    record[output_name] = str(int(value)) if isinstance(value, (int, float)) and value == int(value) else str(value).replace(',', '')
             else:
-                record[field] = '⚠️ 数据缺失'
+                record[output_name] = '⚠️ 数据缺失'
         
         # 发布蜂巢笔记用户数
         if '发布蜂巢笔记用户数' in row:
@@ -202,6 +204,18 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> l
             record['发布蜂巢笔记用户数'] = str(int(value)) if not pd.isna(value) else '⚠️ 数据缺失'
         else:
             record['发布蜂巢笔记用户数'] = '⚠️ 数据缺失'
+        
+        # 计算互动人数占比（如果原始数据中没有或需要重新计算）
+        # 公式：互动人数占比 = 互动人数 / 活跃用户数 * 100%
+        if '互动人数' in record and '活跃用户数' in record:
+            try:
+                互动人数 = float(str(record['互动人数']).replace(',', ''))
+                活跃用户数 = float(str(record['活跃用户数']).replace(',', ''))
+                if 活跃用户数 > 0:
+                    占比 = (互动人数 / 活跃用户数) * 100
+                    record['互动人数占比'] = f"{占比:.2f}%"
+            except:
+                pass  # 如果计算失败，保持原有值
         
         # 预留字段
         record['预留1'] = ''
