@@ -78,6 +78,10 @@ def analyze():
         df_content = normalize_columns(df_content)
         df_school = normalize_columns(df_school)
         
+        # 调试：打印列名
+        print("DEBUG - 用户基本情况列名:", df_user.columns.tolist())
+        print("DEBUG - 内容生产情况列名:", df_content.columns.tolist())
+        
         # 解析日期
         df_user['日期'] = pd.to_datetime(df_user['日期'])
         df_content['日期'] = pd.to_datetime(df_content['日期'])
@@ -146,6 +150,8 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> l
             possible_names = mapping['input']
             output_name = mapping['output']
             actual_col = find_column(df_user, possible_names)
+            if field == '人均停留时长(分钟)':
+                print(f"DEBUG - 查找字段: {field}, 可能的名称: {possible_names}, 实际找到的列: {actual_col}")
             if actual_col and actual_col in row:
                 value = row[actual_col]
                 if pd.isna(value):
