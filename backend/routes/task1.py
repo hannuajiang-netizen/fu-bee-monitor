@@ -127,7 +127,7 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> l
         # 格式: '输出字段名': {'input': [可能的输入列名], 'output': '输出时显示的列名'}
         user_field_mappings = {
             '活跃用户数': {'input': ['活跃用户数', '活跃用户', 'DAU', 'dau'], 'output': '活跃用户数'},
-            '人均停留时长(分钟)': {'input': ['人均停留时长(分钟)', '人均停留时长', '平均停留时长', '停留时长'], 'output': '人均停留时长min'},
+            '人均停留时长(分钟)': {'input': ['人均停留时长[分钟]', '人均停留时长(分钟)', '人均停留时长', '平均停留时长', '停留时长'], 'output': '人均停留时长min'},
             '互动次数': {'input': ['互动次数', '互动量'], 'output': '互动次数'},
             '互动人数': {'input': ['互动人数'], 'output': '互动人数'},
             '互动人数占比': {'input': ['互动人数占比', '互动占比'], 'output': '互动人数占比'},
