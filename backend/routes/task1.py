@@ -147,7 +147,7 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> l
             output_name = mapping['output']
             actual_col = find_column(df_user, possible_names)
             if actual_col and actual_col in row:
-                value = row[field]
+                value = row[actual_col]
                 if pd.isna(value):
                     record[output_name] = '⚠️ 数据缺失'
                 elif '率' in output_name or '占比' in output_name:
