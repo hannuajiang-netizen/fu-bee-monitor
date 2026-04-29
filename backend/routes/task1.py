@@ -99,6 +99,9 @@ def analyze():
         })
         
     except Exception as e:
+        import traceback
+        print(f"ERROR: {str(e)}")
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 
