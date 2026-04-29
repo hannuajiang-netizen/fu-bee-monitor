@@ -11,7 +11,7 @@ const { TextArea } = Typography
 const columns = [
   { title: '日期', dataIndex: '日期', key: '日期', fixed: 'left', width: 120 },
   { title: '活跃用户数', dataIndex: '活跃用户数', key: '活跃用户数', width: 120 },
-  { title: '人均停留时长(分钟)', dataIndex: '人均停留时长(分钟)', key: '人均停留时长(分钟)', width: 150 },
+  { title: '人均停留时长min', dataIndex: '人均停留时长min', key: '人均停留时长min', width: 150 },
   { title: '互动次数', dataIndex: '互动次数', key: '互动次数', width: 100 },
   { title: '互动人数', dataIndex: '互动人数', key: '互动人数', width: 100 },
   { title: '互动人数占比', dataIndex: '互动人数占比', key: '互动人数占比', width: 120 },

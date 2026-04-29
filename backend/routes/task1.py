@@ -120,49 +120,52 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> l
         record['日期'] = row['日期'].strftime('%Y-%m-%d')
         
         # 从用户基本情况获取的字段（支持多种可能的列名）
+        # 格式: '输出字段名': {'input': [可能的输入列名], 'output': '输出时显示的列名'}
         user_field_mappings = {
-            '活跃用户数': ['活跃用户数', '活跃用户', 'DAU', 'dau'],
-            '人均停留时长(分钟)': ['人均停留时长(分钟)', '人均停留时长', '平均停留时长', '停留时长'],
-            '互动次数': ['互动次数', '互动量'],
-            '互动人数': ['互动人数'],
-            '互动人数占比': ['互动人数占比', '互动占比'],
-            '分享人数': ['分享人数'],
-            '关注人数': ['关注人数'],
-            '次日留存率': ['次日留存率', '次留率', '次日留存'],
-            '3留率': ['3留率', '3日留存率', '三日留存率'],
-            '7留率': ['7留率', '7日留存率', '七日留存率'],
-            '14留率': ['14留率', '14日留存率', '十四日留存率'],
-            '30日留率': ['30日留率', '30日留存率', '三十日留存率'],
-            '活跃在群用户数': ['活跃在群用户数', '群活跃用户数'],
-            '群活跃用户数': ['群活跃用户数'],
-            '群发言用户数': ['群发言用户数'],
-            '活跃在蜂巢用户数': ['活跃在蜂巢用户数', '蜂巢活跃用户数'],
-            '蜂巢活跃用户数': ['蜂巢活跃用户数'],
-            '发布蜂巢笔记用户数': ['发布蜂巢笔记用户数']
+            '活跃用户数': {'input': ['活跃用户数', '活跃用户', 'DAU', 'dau'], 'output': '活跃用户数'},
+            '人均停留时长(分钟)': {'input': ['人均停留时长(分钟)', '人均停留时长', '平均停留时长', '停留时长'], 'output': '人均停留时长min'},
+            '互动次数': {'input': ['互动次数', '互动量'], 'output': '互动次数'},
+            '互动人数': {'input': ['互动人数'], 'output': '互动人数'},
+            '互动人数占比': {'input': ['互动人数占比', '互动占比'], 'output': '互动人数占比'},
+            '分享人数': {'input': ['分享人数'], 'output': '分享人数'},
+            '关注人数': {'input': ['关注人数'], 'output': '关注人数'},
+            '次日留存率': {'input': ['次日留存率', '次留率', '次日留存'], 'output': '次日留存率'},
+            '3留率': {'input': ['3留率', '3日留存率', '三日留存率'], 'output': '3留率'},
+            '7留率': {'input': ['7留率', '7日留存率', '七日留存率'], 'output': '7留率'},
+            '14留率': {'input': ['14留率', '14日留存率', '十四日留存率'], 'output': '14留率'},
+            '30日留率': {'input': ['30日留率', '30日留存率', '三十日留存率'], 'output': '30日留率'},
+            '活跃在群用户数': {'input': ['活跃在群用户数', '群活跃用户数'], 'output': '活跃在群用户数'},
+            '群活跃用户数': {'input': ['群活跃用户数'], 'output': '群活跃用户数'},
+            '群发言用户数': {'input': ['群发言用户数'], 'output': '群发言用户数'},
+            '活跃在蜂巢用户数': {'input': ['活跃在蜂巢用户数', '蜂巢活跃用户数'], 'output': '活跃在蜂巢用户数'},
+            '蜂巢活跃用户数': {'input': ['蜂巢活跃用户数'], 'output': '蜂巢活跃用户数'},
+            '发布蜂巢笔记用户数': {'input': ['发布蜂巢笔记用户数'], 'output': '发布蜂巢笔记用户数'}
         }
         
-        for field, possible_names in user_field_mappings.items():
+        for field, mapping in user_field_mappings.items():
+            possible_names = mapping['input']
+            output_name = mapping['output']
             actual_col = find_column(df_user, possible_names)
             if actual_col and actual_col in row:
                 value = row[field]
                 if pd.isna(value):
-                    record[field] = '⚠️ 数据缺失'
-                elif '率' in field or '占比' in field:
+                    record[output_name] = '⚠️ 数据缺失'
+                elif '率' in output_name or '占比' in output_name:
                     # 百分比处理
                     if isinstance(value, (int, float)):
                         if value <= 1:
                             value = value * 100
-                        record[field] = f"{value:.2f}%"
+                        record[output_name] = f"{value:.2f}%"
                     else:
-                        record[field] = str(value)
+                        record[output_name] = str(value)
                 else:
                     # 数值处理
                     if isinstance(value, (int, float)):
-                        record[field] = str(int(value)) if isinstance(value, (int, float)) and value == int(value) else str(value)
+                        record[output_name] = str(int(value)) if isinstance(value, (int, float)) and value == int(value) else str(value)
                     else:
-                        record[field] = str(value).replace(',', '')
+                        record[output_name] = str(value).replace(',', '')
             else:
-                record[field] = '⚠️ 数据缺失'
+                record[output_name] = '⚠️ 数据缺失'
         
         # 从内容生产情况获取的字段
         content_field_mappings = {
