@@ -3,7 +3,7 @@ import pandas as pd
 import io
 import os
 from datetime import datetime
-from utils.excel_parser import read_excel_file, normalize_columns, format_percentage, format_number
+from utils.excel_parser import read_excel_file, normalize_columns, format_percentage, format_number, find_column
 from utils.calculator import calculate_weekly_metrics
 
 task1_bp = Blueprint('task1', __name__)
@@ -119,16 +119,31 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> l
         # 日期
         record['日期'] = row['日期'].strftime('%Y-%m-%d')
         
-        # 从用户基本情况获取的字段
-        user_fields = [
-            '活跃用户数', '人均停留时长(分钟)', '互动次数', '互动人数',
-            '互动人数占比', '分享人数', '关注人数', '次日留存率', '3留率',
-            '7留率', '14留率', '30日留率', '活跃在群用户数', '群活跃用户数',
-            '群发言用户数', '活跃在蜂巢用户数', '蜂巢活跃用户数'
-        ]
+        # 从用户基本情况获取的字段（支持多种可能的列名）
+        user_field_mappings = {
+            '活跃用户数': ['活跃用户数', '活跃用户', 'DAU', 'dau'],
+            '人均停留时长(分钟)': ['人均停留时长(分钟)', '人均停留时长', '平均停留时长', '停留时长'],
+            '互动次数': ['互动次数', '互动量'],
+            '互动人数': ['互动人数'],
+            '互动人数占比': ['互动人数占比', '互动占比'],
+            '分享人数': ['分享人数'],
+            '关注人数': ['关注人数'],
+            '次日留存率': ['次日留存率', '次留率', '次日留存'],
+            '3留率': ['3留率', '3日留存率', '三日留存率'],
+            '7留率': ['7留率', '7日留存率', '七日留存率'],
+            '14留率': ['14留率', '14日留存率', '十四日留存率'],
+            '30日留率': ['30日留率', '30日留存率', '三十日留存率'],
+            '活跃在群用户数': ['活跃在群用户数', '群活跃用户数'],
+            '群活跃用户数': ['群活跃用户数'],
+            '群发言用户数': ['群发言用户数'],
+            '活跃在蜂巢用户数': ['活跃在蜂巢用户数', '蜂巢活跃用户数'],
+            '蜂巢活跃用户数': ['蜂巢活跃用户数'],
+            '发布蜂巢笔记用户数': ['发布蜂巢笔记用户数']
+        }
         
-        for field in user_fields:
-            if field in row:
+        for field, possible_names in user_field_mappings.items():
+            actual_col = find_column(df_user, possible_names)
+            if actual_col and actual_col in row:
                 value = row[field]
                 if pd.isna(value):
                     record[field] = '⚠️ 数据缺失'
@@ -150,14 +165,17 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> l
                 record[field] = '⚠️ 数据缺失'
         
         # 从内容生产情况获取的字段
-        content_fields = [
-            '当日发布笔记量', '当日发布笔记用户数',
-            '累计发布笔记量', '累计发布笔记用户数'
-        ]
+        content_field_mappings = {
+            '当日发布笔记量': ['当日发布笔记量', '发布笔记量'],
+            '当日发布笔记用户数': ['当日发布笔记用户数', '发布笔记用户数'],
+            '累计发布笔记量': ['累计发布笔记量'],
+            '累计发布笔记用户数': ['累计发布笔记用户数']
+        }
         
-        for field in content_fields:
-            col_name = field + '_c' if field + '_c' in row else field
-            if col_name in row:
+        for field, possible_names in content_field_mappings.items():
+            actual_col = find_column(df_content, possible_names)
+            col_name = actual_col + '_c' if actual_col and actual_col + '_c' in row else actual_col
+            if col_name and col_name in row:
                 value = row[col_name]
                 if pd.isna(value):
                     record[field] = '⚠️ 数据缺失'

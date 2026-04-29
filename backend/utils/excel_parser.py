@@ -9,9 +9,24 @@ def read_excel_file(file_bytes: bytes) -> pd.DataFrame:
 
 
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """标准化列名：去除空格"""
+    """标准化列名：去除空格，统一括号"""
     df.columns = df.columns.str.strip()
+    # 统一括号类型（中文括号转英文括号）
+    df.columns = df.columns.str.replace('（', '(', regex=False).str.replace('）', ')', regex=False)
     return df
+
+
+def find_column(df: pd.DataFrame, possible_names: list) -> str:
+    """根据可能的列名列表，找到实际存在的列名"""
+    columns = list(df.columns)
+    for name in possible_names:
+        if name in columns:
+            return name
+        # 尝试模糊匹配
+        for col in columns:
+            if name in col or col in name:
+                return col
+    return None
 
 
 def parse_date_column(df: pd.DataFrame, date_col: str = '日期') -> pd.DataFrame:
