@@ -94,8 +94,12 @@ def analyze():
         df_user['日期'] = pd.to_datetime(df_user['日期'])
         df_content['日期'] = pd.to_datetime(df_content['日期'])
         
+        # 解析蜂巢数据日期（如果有日期列）
+        if '日期' in df_hive.columns:
+            df_hive['日期'] = pd.to_datetime(df_hive['日期'])
+        
         # 生成14天汇总表
-        summary_table = generate_summary_table(df_user, df_content)
+        summary_table = generate_summary_table(df_user, df_content, df_hive)
         
         # 生成周报文本
         weekly_report = generate_weekly_report(df_user, df_content, df_school)
@@ -113,11 +117,15 @@ def analyze():
         return jsonify({'error': str(e)}), 500
 
 
-def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> list:
+def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame, df_hive: pd.DataFrame = None) -> list:
     """生成近14天汇总表"""
     
     # 合并数据
     merged = df_user.merge(df_content, on='日期', how='left', suffixes=('', '_c'))
+    
+    # 合并蜂巢数据（如果有）
+    if df_hive is not None and '日期' in df_hive.columns:
+        merged = merged.merge(df_hive, on='日期', how='left', suffixes=('', '_hive'))
     merged = merged.sort_values('日期', ascending=False)
     
     # 取近14天
@@ -206,12 +214,37 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame) -> l
             else:
                 record[output_name] = '⚠️ 数据缺失'
         
-        # 发布蜂巢笔记用户数
-        if '发布蜂巢笔记用户数' in row:
-            value = row['发布蜂巢笔记用户数']
-            record['发布蜂巢笔记用户数'] = str(int(value)) if not pd.isna(value) else '⚠️ 数据缺失'
-        else:
-            record['发布蜂巢笔记用户数'] = '⚠️ 数据缺失'
+        # 从蜂巢数据获取的字段
+        hive_field_mappings = {
+            '活跃在群用户数': ['活跃在群用户数', '群活跃用户数'],
+            '群活跃用户数': ['群活跃用户数'],
+            '群发言用户数': ['群发言用户数'],
+            '活跃在蜂巢用户数': ['活跃在蜂巢用户数', '蜂巢活跃用户数'],
+            '蜂巢活跃用户数': ['蜂巢活跃用户数'],
+            '发布蜂巢笔记用户数': ['发布蜂巢笔记用户数']
+        }
+        
+        for field, possible_names in hive_field_mappings.items():
+            # 先尝试从合并后的数据中获取（可能来自用户基本情况或蜂巢数据）
+            actual_col = find_column(df_user, possible_names) if field in ['活跃在群用户数', '群活跃用户数', '群发言用户数'] else None
+            if not actual_col and df_hive is not None:
+                actual_col = find_column(df_hive, possible_names)
+            
+            col_name = actual_col
+            if not col_name and df_hive is not None:
+                # 尝试带后缀的列名
+                actual_col_hive = find_column(df_hive, possible_names)
+                if actual_col_hive:
+                    col_name = actual_col_hive + '_hive'
+            
+            if col_name and col_name in row:
+                value = row[col_name]
+                if pd.isna(value):
+                    record[field] = '⚠️ 数据缺失'
+                else:
+                    record[field] = str(int(value)) if isinstance(value, (int, float)) and value == int(value) else str(value).replace(',', '')
+            else:
+                record[field] = '⚠️ 数据缺失'
         
         # 计算互动人数占比（如果原始数据中没有或需要重新计算）
         # 公式：互动人数占比 = 互动人数 / 活跃用户数 * 100%
