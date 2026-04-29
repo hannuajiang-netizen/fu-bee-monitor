@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { Card, Upload, Button, Table, message, Spin, Typography } from 'antd'
+import { Card, Upload, Button, Table, message, Spin, Typography, Row, Col } from 'antd'
 import { InboxOutlined, CopyOutlined, RocketOutlined } from '@ant-design/icons'
 import axios from 'axios'
 
 const { Dragger } = Upload
-const { Title } = Typography
+const { Title, Text } = Typography
+const { TextArea } = Typography
 
 // 25列定义
 const columns = [
@@ -96,44 +97,66 @@ function Task1() {
     message.success('表格已复制到剪贴板')
   }
 
+  const copyText = () => {
+    if (!result?.weekly_report) return
+    navigator.clipboard.writeText(result.weekly_report)
+    message.success('文本已复制到剪贴板')
+  }
+
+  const uploadProps = (field) => ({
+    name: field,
+    multiple: false,
+    beforeUpload: () => false,
+    onChange: (info) => handleFileChange(field, info),
+    fileList: files[field] ? [files[field]] : []
+  })
+
   return (
-    <div style={{ padding: 24 }}>
-      <Title level={2}>任务1 - 校园认证用户DAU监控</Title>
+    <div>
+      <Title level={4}>校园认证用户DAU监控</Title>
       
+      {/* 上传区域 */}
       <Card title="📁 上传数据文件" style={{ marginBottom: 24 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
-          <Dragger
-            accept=".xlsx,.xls"
-            beforeUpload={(file) => { handleFileChange('user_basic', { file }); return false }}
-            showUploadList={false}
-          >
-            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>用户基本情况</p>
-            {files.user_basic && <p style={{ color: 'green' }}>✅ {files.user_basic.name}</p>}
-          </Dragger>
-          
-          <Dragger
-            accept=".xlsx,.xls"
-            beforeUpload={(file) => { handleFileChange('content_produce', { file }); return false }}
-            showUploadList={false}
-          >
-            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>内容生产情况</p>
-            {files.content_produce && <p style={{ color: 'green' }}>✅ {files.content_produce.name}</p>}
-          </Dragger>
-          
-          <Dragger
-            accept=".xlsx,.xls"
-            beforeUpload={(file) => { handleFileChange('school_detail', { file }); return false }}
-            showUploadList={false}
-          >
-            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>累计单校情况</p>
-            {files.school_detail && <p style={{ color: 'green' }}>✅ {files.school_detail.name}</p>}
-          </Dragger>
-        </div>
+        <Row gutter={16}>
+          <Col span={8}>
+            <div style={{ textAlign: 'center', marginBottom: 8 }}>
+              <Text strong>📁 用户基本情况</Text>
+            </div>
+            <Dragger {...uploadProps('user_basic')} accept=".xlsx,.xls">
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">点击或拖拽文件到此处</p>
+              <p className="ant-upload-hint">支持 .xlsx / .xls 格式</p>
+            </Dragger>
+          </Col>
+          <Col span={8}>
+            <div style={{ textAlign: 'center', marginBottom: 8 }}>
+              <Text strong>📁 内容生产情况</Text>
+            </div>
+            <Dragger {...uploadProps('content_produce')} accept=".xlsx,.xls">
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">点击或拖拽文件到此处</p>
+              <p className="ant-upload-hint">支持 .xlsx / .xls 格式</p>
+            </Dragger>
+          </Col>
+          <Col span={8}>
+            <div style={{ textAlign: 'center', marginBottom: 8 }}>
+              <Text strong>📁 累计单校情况</Text>
+            </div>
+            <Dragger {...uploadProps('school_detail')} accept=".xlsx,.xls">
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">点击或拖拽文件到此处</p>
+              <p className="ant-upload-hint">支持 .xlsx / .xls 格式</p>
+            </Dragger>
+          </Col>
+        </Row>
         
-        <div style={{ marginTop: 16, textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', marginTop: 24 }}>
           <Button
             type="primary"
             size="large"
@@ -142,11 +165,12 @@ function Task1() {
             loading={loading}
             disabled={!canAnalyze}
           >
-            开始分析
+            🚀 开始分析
           </Button>
         </div>
       </Card>
 
+      {/* 结果区域 */}
       {loading && (
         <div style={{ textAlign: 'center', padding: 40 }}>
           <Spin size="large" />
@@ -156,12 +180,13 @@ function Task1() {
 
       {result && (
         <>
+          {/* 汇总表格 */}
           <Card 
-            title="近14天汇总表" 
+            title="📊 近14天汇总表" 
             style={{ marginBottom: 24 }}
             extra={
               <Button icon={<CopyOutlined />} onClick={copyTable}>
-                复制表格
+                📋 复制表格
               </Button>
             }
           >
@@ -175,10 +200,25 @@ function Task1() {
             />
           </Card>
 
-          <Card title="周报结论文本">
-            <pre style={{ background: '#f5f5f5', padding: 16, fontFamily: 'monospace' }}>
-              {result.weekly_report}
-            </pre>
+          {/* 周报文本 */}
+          <Card
+            title="📝 周报结论文本"
+            extra={
+              <Button icon={<CopyOutlined />} onClick={copyText}>
+                📋 复制文本
+              </Button>
+            }
+          >
+            <TextArea
+              value={result.weekly_report}
+              rows={8}
+              readOnly
+              style={{ 
+                background: '#f5f5f5', 
+                fontFamily: 'monospace',
+                fontSize: 14
+              }}
+            />
           </Card>
         </>
       )}
