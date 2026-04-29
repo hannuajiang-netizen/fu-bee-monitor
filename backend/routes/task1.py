@@ -100,6 +100,9 @@ def analyze():
         
         # 生成14天汇总表
         summary_table = generate_summary_table(df_user, df_content, df_hive)
+        print(f"DEBUG - 生成 {len(summary_table)} 条记录")
+        if summary_table:
+            print(f"DEBUG - 第一条记录: {summary_table[0]}")
         
         # 生成周报文本
         weekly_report = generate_weekly_report(df_user, df_content, df_school)
