@@ -95,7 +95,11 @@ def analyze():
         df_content['日期'] = pd.to_datetime(df_content['日期'])
         
         # 解析蜂巢数据日期（如果有日期列）
-        if '日期' in df_hive.columns:
+        # 蜂巢数据可能使用 'day' 或 '日期' 作为日期列名
+        if 'day' in df_hive.columns:
+            df_hive = df_hive.rename(columns={'day': '日期'})
+            df_hive['日期'] = pd.to_datetime(df_hive['日期'])
+        elif '日期' in df_hive.columns:
             df_hive['日期'] = pd.to_datetime(df_hive['日期'])
         
         # 生成14天汇总表
