@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Any, Tuple
 from datetime import datetime, timedelta
+from utils.excel_parser import find_column
 
 
 def calculate_weighted_average(df: pd.DataFrame, value_col: str, weight_col: str) -> float:
@@ -76,8 +77,13 @@ def calculate_weekly_metrics(df_user: pd.DataFrame, df_content: pd.DataFrame,
     metrics['last_avg_dau'] = int(last_week['活跃用户数'].sum() / 7) if not last_week.empty else 0
     
     # 人均消费时长 = 7天人均停留时长的算术平均，保留2位小数
-    metrics['this_avg_dur'] = round(this_week['人均停留时长(分钟)'].mean(), 2) if not this_week.empty else 0
-    metrics['last_avg_dur'] = round(last_week['人均停留时长(分钟)'].mean(), 2) if not last_week.empty else 0
+    dur_col = find_column(this_week, ['人均停留时长[分钟]', '人均停留时长(分钟)', '人均停留时长', '平均停留时长', '停留时长'])
+    if dur_col:
+        metrics['this_avg_dur'] = round(this_week[dur_col].mean(), 2) if not this_week.empty else 0
+        metrics['last_avg_dur'] = round(last_week[dur_col].mean(), 2) if not last_week.empty else 0
+    else:
+        metrics['this_avg_dur'] = 0
+        metrics['last_avg_dur'] = 0
     
     # 次留 = 7天次日留存率的算术平均，保留2位小数
     # 注意：如果原始数据是 0.xx 格式需 ×100
