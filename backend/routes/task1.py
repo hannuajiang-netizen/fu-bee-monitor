@@ -370,11 +370,19 @@ def generate_weekly_report(df_user: pd.DataFrame, df_content: pd.DataFrame,
         last_week = df_content[(df_content['日期'] >= (df_content['日期'].max() - pd.Timedelta(days=13))) & 
                               (df_content['日期'] < (df_content['日期'].max() - pd.Timedelta(days=6)))]
         
+        # 调试信息
+        print(f"DEBUG - 内容生产情况列名: {df_content.columns.tolist()}")
+        
         # 日均生产用户数 = 当日发布笔记数的周均
         prod_col = find_column(this_week, ['当日发布笔记数', '当日发布笔记量'])
+        print(f"DEBUG - 找到的列名: {prod_col}")
         if prod_col:
-            this_avg_prod = int(this_week[prod_col].sum() / 7) if not this_week.empty else 0
-            last_avg_prod = int(last_week[prod_col].sum() / 7) if not last_week.empty else 0
+            this_sum = this_week[prod_col].sum()
+            last_sum = last_week[prod_col].sum() if not last_week.empty else 0
+            this_avg_prod = int(this_sum / 7) if not this_week.empty else 0
+            last_avg_prod = int(last_sum / 7) if not last_week.empty else 0
+            print(f"DEBUG - 本周{prod_col}总和: {this_sum}, 日均: {this_avg_prod}")
+            print(f"DEBUG - 上周{prod_col}总和: {last_sum}, 日均: {last_avg_prod}")
             report_lines.append(f"日均生产用户数 {this_avg_prod}（上周 {last_avg_prod}）")
     
     # 累计单校情况相关指标
