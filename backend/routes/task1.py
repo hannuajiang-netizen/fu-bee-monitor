@@ -188,7 +188,7 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame, df_h
             '3留率': {'input': ['3留率', '3日留存率', '三日留存率'], 'output': '3留率'},
             '7留率': {'input': ['7留率', '7日留存率', '七日留存率'], 'output': '7留率'},
             '14留率': {'input': ['14留率', '14日留存率', '十四日留存率'], 'output': '14留率'},
-            '30日留率': {'input': ['30日留率', '30日留存率', '三十日留存率'], 'output': '30日留率'},
+            '30留率': {'input': ['30留率', '30日留存率', '三十日留存率'], 'output': '30留率'},
             '活跃在群用户数': {'input': ['活跃在群用户数', '群活跃用户数'], 'output': '活跃在群用户数'},
             '群活跃用户数': {'input': ['群活跃用户数'], 'output': '群活跃用户数'},
             '群发言用户数': {'input': ['群发言用户数'], 'output': '群发言用户数'},
@@ -224,11 +224,9 @@ def generate_summary_table(df_user: pd.DataFrame, df_content: pd.DataFrame, df_h
             else:
                 record[output_name] = '⚠️ 数据缺失'
         
-        # 从内容生产情况获取的字段（输出字段名已修改：量->数，用户数->人数）
+        # 从内容生产情况获取的字段
         content_field_mappings = {
-            '当日发布笔记数': {'input': ['当日发布笔记数', '当日发布笔记量', '发布笔记数', '发布笔记量'], 'output': '当日发布笔记数'},
             '当日发布笔记人数': {'input': ['当日发布笔记人数', '当日发布笔记用户数', '发布笔记人数', '发布笔记用户数'], 'output': '当日发布笔记人数'},
-            '累计发布笔记数': {'input': ['累计发布笔记数', '累计发布笔记量'], 'output': '累计发布笔记数'},
             '累计发布笔记人数': {'input': ['累计发布笔记人数', '累计发布笔记用户数'], 'output': '累计发布笔记人数'}
         }
         
@@ -386,7 +384,19 @@ def generate_weekly_report(df_user: pd.DataFrame, df_content: pd.DataFrame,
     
     # 累计单校情况相关指标
     if has_school:
-        school_count = calculate_school_count(df_school)
-        report_lines.append(f"覆盖 {school_count} 所高校")
+        # 计算本周和上周的高校数
+        if '日期' in df_school.columns:
+            this_week_school = df_school[df_school['日期'] >= (df_school['日期'].max() - pd.Timedelta(days=6))]
+            last_week_school = df_school[(df_school['日期'] >= (df_school['日期'].max() - pd.Timedelta(days=13))) & 
+                                        (df_school['日期'] < (df_school['日期'].max() - pd.Timedelta(days=6)))]
+            this_school_count = calculate_school_count(this_week_school)
+            last_school_count = calculate_school_count(last_week_school)
+        else:
+            this_school_count = calculate_school_count(df_school)
+            last_school_count = 0
+        
+        school_diff = this_school_count - last_school_count
+        school_diff_str = f"+{school_diff}" if school_diff >= 0 else f"{school_diff}"
+        report_lines.append(f"覆盖 {this_school_count} 所高校（{school_diff_str}）")
     
     return "\n".join(report_lines)

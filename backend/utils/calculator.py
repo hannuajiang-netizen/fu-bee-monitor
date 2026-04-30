@@ -21,32 +21,36 @@ def calculate_weighted_average(df: pd.DataFrame, value_col: str, weight_col: str
 def calculate_school_count(df_school: pd.DataFrame, period: str = 'this_week') -> int:
     """
     从「累计单校情况」表中计算覆盖高校数
-    取最新日期的所有学校数据汇总（去重计数）
+    统计各区间（=0、>0、>=15、>=100、>=800、>=2000）学校数之和
     """
     if df_school.empty:
         return 0
     
-    # 查找学校名称/ID列
-    school_col = None
+    # 查找区间列
+    interval_cols = []
     for col in df_school.columns:
         col_lower = col.lower()
-        if any(keyword in col_lower for keyword in ['学校', '高校', '院校', 'school', '大学', '学院']):
-            if '名称' in col or 'id' in col_lower or '编号' in col:
-                school_col = col
-                break
+        # 匹配各种区间列名格式
+        if any(pattern in col for pattern in ['=0', '>0', '>=15', '>=100', '>=800', '>=2000', 
+                                               '0人', '1-14人', '15-99人', '100-799人', '800-1999人', '2000人以上',
+                                               '区间', '分布']):
+            interval_cols.append(col)
     
-    if school_col:
+    if interval_cols:
         # 取最新日期
         if '日期' in df_school.columns:
             latest_date = df_school['日期'].max()
             latest_data = df_school[df_school['日期'] == latest_date]
-            # 去重计数
-            return int(latest_data[school_col].nunique())
         else:
-            # 如果没有日期列，直接统计所有学校
-            return int(df_school[school_col].nunique())
+            latest_data = df_school
+        
+        # 累加所有区间的学校数
+        total_count = 0
+        for col in interval_cols:
+            total_count += latest_data[col].sum()
+        return int(total_count)
     else:
-        # 如果没有找到学校列，返回行数（假设每行一个学校）
+        # 如果没有找到区间列，返回行数（假设每行一个学校）
         return int(len(df_school))
 
 
