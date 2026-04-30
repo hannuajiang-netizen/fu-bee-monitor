@@ -167,7 +167,7 @@ function Task1() {
           </Dragger>
         </div>
         
-        <div style={{ marginTop: 16, textAlign: 'center' }}>
+        <div style={{ marginTop: 40, textAlign: 'center' }}>
           <Button
             type="primary"
             size="large"
