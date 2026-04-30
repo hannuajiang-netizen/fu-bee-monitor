@@ -118,53 +118,81 @@ function Task1() {
       
       <Card title="📁 上传数据文件（共4个）" style={{ marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <Dragger
-            accept=".xlsx,.xls"
-            beforeUpload={(file) => { handleFileChange('user_basic', { file }); return false }}
-            onRemove={() => handleRemoveFile('user_basic')}
-            showUploadList={files.user_basic ? { showRemoveIcon: true } : false}
-            fileList={files.user_basic ? [{ uid: '1', name: files.user_basic.name, status: 'done' }] : []}
-          >
-            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>1.用户基本情况</p>
-            {!files.user_basic && <p style={{ color: '#999', fontSize: 12 }}>点击或拖拽上传</p>}
-          </Dragger>
+          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: 8 }}>1.用户基本情况</p>
+            {!files.user_basic ? (
+              <Dragger
+                accept=".xlsx,.xls"
+                beforeUpload={(file) => { handleFileChange('user_basic', { file }); return false }}
+                showUploadList={false}
+              >
+                <p><InboxOutlined style={{ fontSize: 32 }} /></p>
+                <p>点击或拖拽上传</p>
+              </Dragger>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4 }}>
+                <span style={{ color: '#52c41a' }}>📄 {files.user_basic.name}</span>
+                <Button type="text" danger size="small" onClick={() => handleRemoveFile('user_basic')}>删除</Button>
+              </div>
+            )}
+          </div>
           
-          <Dragger
-            accept=".xlsx,.xls"
-            beforeUpload={(file) => { handleFileChange('content_produce', { file }); return false }}
-            onRemove={() => handleRemoveFile('content_produce')}
-            showUploadList={files.content_produce ? { showRemoveIcon: true } : false}
-            fileList={files.content_produce ? [{ uid: '2', name: files.content_produce.name, status: 'done' }] : []}
-          >
-            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>2.内容生产情况</p>
-            {!files.content_produce && <p style={{ color: '#999', fontSize: 12 }}>点击或拖拽上传</p>}
-          </Dragger>
+          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: 8 }}>2.内容生产情况</p>
+            {!files.content_produce ? (
+              <Dragger
+                accept=".xlsx,.xls"
+                beforeUpload={(file) => { handleFileChange('content_produce', { file }); return false }}
+                showUploadList={false}
+              >
+                <p><InboxOutlined style={{ fontSize: 32 }} /></p>
+                <p>点击或拖拽上传</p>
+              </Dragger>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4 }}>
+                <span style={{ color: '#52c41a' }}>📄 {files.content_produce.name}</span>
+                <Button type="text" danger size="small" onClick={() => handleRemoveFile('content_produce')}>删除</Button>
+              </div>
+            )}
+          </div>
           
-          <Dragger
-            accept=".xlsx,.xls"
-            beforeUpload={(file) => { handleFileChange('school_detail', { file }); return false }}
-            onRemove={() => handleRemoveFile('school_detail')}
-            showUploadList={files.school_detail ? { showRemoveIcon: true } : false}
-            fileList={files.school_detail ? [{ uid: '3', name: files.school_detail.name, status: 'done' }] : []}
-          >
-            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>3.累计单校情况</p>
-            {!files.school_detail && <p style={{ color: '#999', fontSize: 12 }}>点击或拖拽上传</p>}
-          </Dragger>
+          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: 8 }}>3.累计单校情况</p>
+            {!files.school_detail ? (
+              <Dragger
+                accept=".xlsx,.xls"
+                beforeUpload={(file) => { handleFileChange('school_detail', { file }); return false }}
+                showUploadList={false}
+              >
+                <p><InboxOutlined style={{ fontSize: 32 }} /></p>
+                <p>点击或拖拽上传</p>
+              </Dragger>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4 }}>
+                <span style={{ color: '#52c41a' }}>📄 {files.school_detail.name}</span>
+                <Button type="text" danger size="small" onClick={() => handleRemoveFile('school_detail')}>删除</Button>
+              </div>
+            )}
+          </div>
           
-          <Dragger
-            accept=".xlsx,.xls"
-            beforeUpload={(file) => { handleFileChange('hive_data', { file }); return false }}
-            onRemove={() => handleRemoveFile('hive_data')}
-            showUploadList={files.hive_data ? { showRemoveIcon: true } : false}
-            fileList={files.hive_data ? [{ uid: '4', name: files.hive_data.name, status: 'done' }] : []}
-          >
-            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-            <p>4.蜂巢相关数据</p>
-            {!files.hive_data && <p style={{ color: '#999', fontSize: 12 }}>点击或拖拽上传</p>}
-          </Dragger>
+          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: 8 }}>4.蜂巢相关数据</p>
+            {!files.hive_data ? (
+              <Dragger
+                accept=".xlsx,.xls"
+                beforeUpload={(file) => { handleFileChange('hive_data', { file }); return false }}
+                showUploadList={false}
+              >
+                <p><InboxOutlined style={{ fontSize: 32 }} /></p>
+                <p>点击或拖拽上传</p>
+              </Dragger>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4 }}>
+                <span style={{ color: '#52c41a' }}>📄 {files.hive_data.name}</span>
+                <Button type="text" danger size="small" onClick={() => handleRemoveFile('hive_data')}>删除</Button>
+              </div>
+            )}
+          </div>
         </div>
         
         <div style={{ marginTop: 40, textAlign: 'center' }}>
