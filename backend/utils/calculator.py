@@ -30,14 +30,21 @@ def calculate_school_count(df_school: pd.DataFrame) -> tuple:
     返回：(本周覆盖高校数, 上周覆盖高校数)
     """
     if df_school.empty:
+        print("DEBUG - df_school is empty")
         return 0, 0
     
     # 智能识别列名（去空格）
     df_school.columns = df_school.columns.str.strip()
     
+    print(f"DEBUG - 列名: {df_school.columns.tolist()}")
+    print(f"DEBUG - 数据行数: {len(df_school)}")
+    print(f"DEBUG - 前5行:\n{df_school.head()}")
+    
     # 假设第1列是日期，第3列是学校数
     date_col = df_school.columns[0]
     value_col = df_school.columns[2]
+    
+    print(f"DEBUG - 使用列: date_col={date_col}, value_col={value_col}")
     
     # 确保日期列为 datetime 格式
     df_school[date_col] = pd.to_datetime(df_school[date_col])
@@ -47,13 +54,18 @@ def calculate_school_count(df_school: pd.DataFrame) -> tuple:
     
     # 找到数据中的最新日期（本周基准日）
     latest_date = df_school[date_col].max()
+    print(f"DEBUG - 最新日期: {latest_date}")
     
     # 本周覆盖高校数 = 最新日期那天的所有行「学校数」之和
     this_week_data = df_school[df_school[date_col] == latest_date]
+    print(f"DEBUG - 本周数据行数: {len(this_week_data)}")
+    print(f"DEBUG - 本周数据:\n{this_week_data}")
     this_school_count = int(this_week_data[value_col].sum())
+    print(f"DEBUG - 本周学校数总和: {this_school_count}")
     
     # 上周覆盖高校数 = 最新日期 - 7天 那天的所有行「学校数」之和
     last_week_date = latest_date - pd.Timedelta(days=7)
+    print(f"DEBUG - 上周日期: {last_week_date}")
     last_week_data = df_school[df_school[date_col] == last_week_date]
     
     if last_week_data.empty:
