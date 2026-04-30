@@ -114,7 +114,7 @@ function Task1() {
 
   return (
     <div style={{ padding: 24 }}>
-      <Title level={2}>任务1 - 校园认证用户DAU监控</Title>
+      <Title level={2}>校园认证用户DAU监控</Title>
       
       <Card title="📁 上传数据文件（共4个）" style={{ marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
