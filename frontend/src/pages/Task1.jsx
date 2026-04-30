@@ -118,80 +118,100 @@ function Task1() {
       
       <Card title="📁 上传数据文件（共4个）" style={{ marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa' }}>
-            <p style={{ fontWeight: 'bold', marginBottom: 8 }}>1.用户基本情况</p>
-            {!files.user_basic ? (
-              <Dragger
-                accept=".xlsx,.xls"
-                beforeUpload={(file) => { handleFileChange('user_basic', { file }); return false }}
-                showUploadList={false}
-              >
-                <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-                <p>点击或拖拽上传</p>
-              </Dragger>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4 }}>
-                <span style={{ color: '#52c41a' }}>📄 {files.user_basic.name}</span>
-                <Button type="text" danger size="small" onClick={() => handleRemoveFile('user_basic')}>删除</Button>
-              </div>
-            )}
+          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa', minHeight: 160, display: 'flex', flexDirection: 'column' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: 12, flexShrink: 0 }}>1.用户基本情况</p>
+            <div style={{ flex: 1, minHeight: 0 }}>
+              {!files.user_basic ? (
+                <Dragger
+                  accept=".xlsx,.xls"
+                  beforeUpload={(file) => { handleFileChange('user_basic', { file }); return false }}
+                  showUploadList={false}
+                  style={{ height: '100%', minHeight: 90 }}
+                >
+                  <div style={{ padding: '16px 0' }}>
+                    <p><InboxOutlined style={{ fontSize: 28 }} /></p>
+                    <p style={{ marginTop: 8, fontSize: 14 }}>点击或拖拽上传</p>
+                  </div>
+                </Dragger>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4, height: 90 }}>
+                  <span style={{ color: '#52c41a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 'calc(100% - 60px)' }}>📄 {files.user_basic.name}</span>
+                  <Button type="text" danger size="small" onClick={() => handleRemoveFile('user_basic')}>删除</Button>
+                </div>
+              )}
+            </div>
           </div>
           
-          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa' }}>
-            <p style={{ fontWeight: 'bold', marginBottom: 8 }}>2.内容生产情况</p>
-            {!files.content_produce ? (
-              <Dragger
-                accept=".xlsx,.xls"
-                beforeUpload={(file) => { handleFileChange('content_produce', { file }); return false }}
-                showUploadList={false}
-              >
-                <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-                <p>点击或拖拽上传</p>
-              </Dragger>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4 }}>
-                <span style={{ color: '#52c41a' }}>📄 {files.content_produce.name}</span>
-                <Button type="text" danger size="small" onClick={() => handleRemoveFile('content_produce')}>删除</Button>
-              </div>
-            )}
+          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa', minHeight: 160, display: 'flex', flexDirection: 'column' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: 12, flexShrink: 0 }}>2.内容生产情况</p>
+            <div style={{ flex: 1, minHeight: 0 }}>
+              {!files.content_produce ? (
+                <Dragger
+                  accept=".xlsx,.xls"
+                  beforeUpload={(file) => { handleFileChange('content_produce', { file }); return false }}
+                  showUploadList={false}
+                  style={{ height: '100%', minHeight: 90 }}
+                >
+                  <div style={{ padding: '16px 0' }}>
+                    <p><InboxOutlined style={{ fontSize: 28 }} /></p>
+                    <p style={{ marginTop: 8, fontSize: 14 }}>点击或拖拽上传</p>
+                  </div>
+                </Dragger>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4, height: 90 }}>
+                  <span style={{ color: '#52c41a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 'calc(100% - 60px)' }}>📄 {files.content_produce.name}</span>
+                  <Button type="text" danger size="small" onClick={() => handleRemoveFile('content_produce')}>删除</Button>
+                </div>
+              )}
+            </div>
           </div>
           
-          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa' }}>
-            <p style={{ fontWeight: 'bold', marginBottom: 8 }}>3.累计单校情况</p>
-            {!files.school_detail ? (
-              <Dragger
-                accept=".xlsx,.xls"
-                beforeUpload={(file) => { handleFileChange('school_detail', { file }); return false }}
-                showUploadList={false}
-              >
-                <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-                <p>点击或拖拽上传</p>
-              </Dragger>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4 }}>
-                <span style={{ color: '#52c41a' }}>📄 {files.school_detail.name}</span>
-                <Button type="text" danger size="small" onClick={() => handleRemoveFile('school_detail')}>删除</Button>
-              </div>
-            )}
+          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa', minHeight: 160, display: 'flex', flexDirection: 'column' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: 12, flexShrink: 0 }}>3.累计单校情况</p>
+            <div style={{ flex: 1, minHeight: 0 }}>
+              {!files.school_detail ? (
+                <Dragger
+                  accept=".xlsx,.xls"
+                  beforeUpload={(file) => { handleFileChange('school_detail', { file }); return false }}
+                  showUploadList={false}
+                  style={{ height: '100%', minHeight: 90 }}
+                >
+                  <div style={{ padding: '16px 0' }}>
+                    <p><InboxOutlined style={{ fontSize: 28 }} /></p>
+                    <p style={{ marginTop: 8, fontSize: 14 }}>点击或拖拽上传</p>
+                  </div>
+                </Dragger>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4, height: 90 }}>
+                  <span style={{ color: '#52c41a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 'calc(100% - 60px)' }}>📄 {files.school_detail.name}</span>
+                  <Button type="text" danger size="small" onClick={() => handleRemoveFile('school_detail')}>删除</Button>
+                </div>
+              )}
+            </div>
           </div>
           
-          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa' }}>
-            <p style={{ fontWeight: 'bold', marginBottom: 8 }}>4.蜂巢相关数据</p>
-            {!files.hive_data ? (
-              <Dragger
-                accept=".xlsx,.xls"
-                beforeUpload={(file) => { handleFileChange('hive_data', { file }); return false }}
-                showUploadList={false}
-              >
-                <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-                <p>点击或拖拽上传</p>
-              </Dragger>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4 }}>
-                <span style={{ color: '#52c41a' }}>📄 {files.hive_data.name}</span>
-                <Button type="text" danger size="small" onClick={() => handleRemoveFile('hive_data')}>删除</Button>
-              </div>
-            )}
+          <div style={{ border: '1px dashed #d9d9d9', borderRadius: 8, padding: 16, background: '#fafafa', minHeight: 160, display: 'flex', flexDirection: 'column' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: 12, flexShrink: 0 }}>4.蜂巢相关数据</p>
+            <div style={{ flex: 1, minHeight: 0 }}>
+              {!files.hive_data ? (
+                <Dragger
+                  accept=".xlsx,.xls"
+                  beforeUpload={(file) => { handleFileChange('hive_data', { file }); return false }}
+                  showUploadList={false}
+                  style={{ height: '100%', minHeight: 90 }}
+                >
+                  <div style={{ padding: '16px 0' }}>
+                    <p><InboxOutlined style={{ fontSize: 28 }} /></p>
+                    <p style={{ marginTop: 8, fontSize: 14 }}>点击或拖拽上传</p>
+                  </div>
+                </Dragger>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4, height: 90 }}>
+                  <span style={{ color: '#52c41a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 'calc(100% - 60px)' }}>📄 {files.hive_data.name}</span>
+                  <Button type="text" danger size="small" onClick={() => handleRemoveFile('hive_data')}>删除</Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
