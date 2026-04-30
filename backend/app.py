@@ -12,10 +12,13 @@ CORS(app)
 app.register_blueprint(task1_bp, url_prefix='/api/task1')
 app.register_blueprint(task3_bp, url_prefix='/api/task3')
 
-# 静态文件服务（生产环境）
+# 静态文件服务（生产环境）- 放在最后，避免拦截 API 路由
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
+    # 不处理 API 路径
+    if path.startswith('api/'):
+        return "Not Found", 404
     if path != "" and os.path.exists(os.path.join('../frontend/dist', path)):
         return send_from_directory('../frontend/dist', path)
     return send_from_directory('../frontend/dist', 'index.html')
