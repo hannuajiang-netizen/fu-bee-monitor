@@ -311,19 +311,37 @@ def generate_weekly_report(df_user: pd.DataFrame, df_content: pd.DataFrame,
         return "未上传任何数据文件，无法生成周报。"
     
     # 获取日期范围
+    date_start = "--"
+    date_end = "--"
+    
     if has_user:
+        # 确保日期列为 datetime 类型
+        if not pd.api.types.is_datetime64_any_dtype(df_user['日期']):
+            df_user['日期'] = pd.to_datetime(df_user['日期'])
         latest_date = df_user['日期'].max()
         this_week_start = latest_date - pd.Timedelta(days=6)
         date_start = this_week_start.strftime('%m.%d')
         date_end = latest_date.strftime('%m.%d')
+        print(f"DEBUG - 使用用户数据日期: {date_start}-{date_end}")
     elif has_content:
+        # 确保日期列为 datetime 类型
+        if not pd.api.types.is_datetime64_any_dtype(df_content['日期']):
+            df_content['日期'] = pd.to_datetime(df_content['日期'])
         latest_date = df_content['日期'].max()
         this_week_start = latest_date - pd.Timedelta(days=6)
         date_start = this_week_start.strftime('%m.%d')
         date_end = latest_date.strftime('%m.%d')
-    else:
-        date_start = "--"
-        date_end = "--"
+        print(f"DEBUG - 使用内容数据日期: {date_start}-{date_end}")
+    elif has_school:
+        # 如果只有学校数据，使用学校数据的日期
+        if '日期' in df_school.columns:
+            if not pd.api.types.is_datetime64_any_dtype(df_school['日期']):
+                df_school['日期'] = pd.to_datetime(df_school['日期'])
+            latest_date = df_school['日期'].max()
+            this_week_start = latest_date - pd.Timedelta(days=6)
+            date_start = this_week_start.strftime('%m.%d')
+            date_end = latest_date.strftime('%m.%d')
+            print(f"DEBUG - 使用学校数据日期: {date_start}-{date_end}")
     
     report_lines = [f"近一周（{date_start}-{date_end}）"]
     
