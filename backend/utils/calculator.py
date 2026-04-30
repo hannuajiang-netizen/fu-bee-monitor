@@ -18,54 +18,58 @@ def calculate_weighted_average(df: pd.DataFrame, value_col: str, weight_col: str
     return round(weighted_sum / total_weight, 2)
 
 
-def calculate_school_count(df_school: pd.DataFrame, period: str = 'this_week') -> int:
+def calculate_school_count(df_school: pd.DataFrame) -> tuple:
     """
     从「累计单校情况」表中计算覆盖高校数
-    统计6个区间的学校数之和：=0、>0、>=15、>=100、>=800、>=2000
+    
+    表结构：3列
+    - 第1列：日期
+    - 第2列：活跃人数（区间标识，如 =0、>0、>= 15、>= 100、>= 800、>= 2000）
+    - 第3列：学校数（该区间对应的学校数量）
+    
+    返回：(本周覆盖高校数, 上周覆盖高校数)
     """
     if df_school.empty:
-        return 0
+        return 0, 0
     
-    # 取最新日期的数据
-    if '日期' in df_school.columns:
-        # 确保日期列是datetime类型
-        if not pd.api.types.is_datetime64_any_dtype(df_school['日期']):
-            df_school['日期'] = pd.to_datetime(df_school['日期'])
-        latest_date = df_school['日期'].max()
-        latest_data = df_school[df_school['日期'] == latest_date]
+    # 智能识别列名（去空格）
+    df_school.columns = df_school.columns.str.strip()
+    
+    # 假设第1列是日期，第3列是学校数
+    date_col = df_school.columns[0]
+    value_col = df_school.columns[2]
+    
+    # 确保日期列为 datetime 格式
+    df_school[date_col] = pd.to_datetime(df_school[date_col])
+    
+    # 确保学校数列为数值
+    df_school[value_col] = pd.to_numeric(df_school[value_col], errors='coerce').fillna(0)
+    
+    # 找到数据中的最新日期（本周基准日）
+    latest_date = df_school[date_col].max()
+    
+    # 本周覆盖高校数 = 最新日期那天的所有行「学校数」之和
+    this_week_data = df_school[df_school[date_col] == latest_date]
+    this_school_count = int(this_week_data[value_col].sum())
+    
+    # 上周覆盖高校数 = 最新日期 - 7天 那天的所有行「学校数」之和
+    last_week_date = latest_date - pd.Timedelta(days=7)
+    last_week_data = df_school[df_school[date_col] == last_week_date]
+    
+    if last_week_data.empty:
+        # 如果恰好 -7天没有数据，找最接近的更早日期
+        earlier_dates = df_school[df_school[date_col] < latest_date - pd.Timedelta(days=6)][date_col].unique()
+        if len(earlier_dates) > 0:
+            last_week_date = max(earlier_dates)
+            last_week_data = df_school[df_school[date_col] == last_week_date]
+            last_school_count = int(last_week_data[value_col].sum())
+        else:
+            last_school_count = 0
     else:
-        latest_data = df_school
+        last_school_count = int(last_week_data[value_col].sum())
     
-    # 查找6个区间列（=0、>0、>=15、>=100、>=800、>=2000）
-    interval_patterns = {
-        '=0': ['=0', '等于0', 'eq0', '0人'],
-        '>0': ['>0', '大于0', 'gt0'],
-        '>=15': ['>=15', '大于等于15', 'gte15', '15人'],
-        '>=100': ['>=100', '大于等于100', 'gte100', '100人'],
-        '>=800': ['>=800', '大于等于800', 'gte800', '800人'],
-        '>=2000': ['>=2000', '大于等于2000', 'gte2000', '2000人']
-    }
-    
-    total_count = 0
-    found_intervals = []
-    
-    for interval_type, patterns in interval_patterns.items():
-        for col in latest_data.columns:
-            col_str = str(col).lower()
-            # 检查列名是否匹配区间模式
-            if any(pattern.lower() in col_str for pattern in patterns):
-                # 获取该区间的学校数（取第一行，假设每列是一个区间统计）
-                value = latest_data[col].iloc[0] if not latest_data.empty else 0
-                try:
-                    count = int(float(value))
-                    total_count += count
-                    found_intervals.append(f"{interval_type}: {count}")
-                except (ValueError, TypeError):
-                    pass
-                break
-    
-    print(f"DEBUG - 找到的区间: {found_intervals}, 总计: {total_count}")
-    return int(total_count)
+    print(f"DEBUG - 本周({latest_date.date()}): {this_school_count}, 上周({last_week_date.date()}): {last_school_count}")
+    return this_school_count, last_school_count
 
 
 def get_week_boundaries(df: pd.DataFrame, date_col: str = '日期') -> Tuple[pd.Timestamp, pd.Timestamp, pd.Timestamp, pd.Timestamp]:
