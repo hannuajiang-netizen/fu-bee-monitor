@@ -118,93 +118,53 @@ function Task1() {
       
       <Card title="📁 上传数据文件（共4个）" style={{ marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <div style={{ position: 'relative' }}>
-            <Dragger
-              accept=".xlsx,.xls"
-              beforeUpload={(file) => { handleFileChange('user_basic', { file }); return false }}
-              showUploadList={false}
-            >
-              <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-              <p>1.用户基本情况</p>
-              {files.user_basic && <p style={{ color: 'green' }}>✅ {files.user_basic.name}</p>}
-            </Dragger>
-            {files.user_basic && (
-              <Button 
-                size="small" 
-                danger 
-                style={{ position: 'absolute', top: 5, right: 5 }}
-                onClick={(e) => { e.stopPropagation(); handleRemoveFile('user_basic'); }}
-              >
-                删除
-              </Button>
-            )}
-          </div>
+          <Dragger
+            accept=".xlsx,.xls"
+            beforeUpload={(file) => { handleFileChange('user_basic', { file }); return false }}
+            onRemove={() => handleRemoveFile('user_basic')}
+            showUploadList={files.user_basic ? { showRemoveIcon: true } : false}
+            fileList={files.user_basic ? [{ uid: '1', name: files.user_basic.name, status: 'done' }] : []}
+          >
+            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
+            <p>1.用户基本情况</p>
+            {!files.user_basic && <p style={{ color: '#999', fontSize: 12 }}>点击或拖拽上传</p>}
+          </Dragger>
           
-          <div style={{ position: 'relative' }}>
-            <Dragger
-              accept=".xlsx,.xls"
-              beforeUpload={(file) => { handleFileChange('content_produce', { file }); return false }}
-              showUploadList={false}
-            >
-              <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-              <p>2.内容生产情况</p>
-              {files.content_produce && <p style={{ color: 'green' }}>✅ {files.content_produce.name}</p>}
-            </Dragger>
-            {files.content_produce && (
-              <Button 
-                size="small" 
-                danger 
-                style={{ position: 'absolute', top: 5, right: 5 }}
-                onClick={(e) => { e.stopPropagation(); handleRemoveFile('content_produce'); }}
-              >
-                删除
-              </Button>
-            )}
-          </div>
+          <Dragger
+            accept=".xlsx,.xls"
+            beforeUpload={(file) => { handleFileChange('content_produce', { file }); return false }}
+            onRemove={() => handleRemoveFile('content_produce')}
+            showUploadList={files.content_produce ? { showRemoveIcon: true } : false}
+            fileList={files.content_produce ? [{ uid: '2', name: files.content_produce.name, status: 'done' }] : []}
+          >
+            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
+            <p>2.内容生产情况</p>
+            {!files.content_produce && <p style={{ color: '#999', fontSize: 12 }}>点击或拖拽上传</p>}
+          </Dragger>
           
-          <div style={{ position: 'relative' }}>
-            <Dragger
-              accept=".xlsx,.xls"
-              beforeUpload={(file) => { handleFileChange('school_detail', { file }); return false }}
-              showUploadList={false}
-            >
-              <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-              <p>3.累计单校情况</p>
-              {files.school_detail && <p style={{ color: 'green' }}>✅ {files.school_detail.name}</p>}
-            </Dragger>
-            {files.school_detail && (
-              <Button 
-                size="small" 
-                danger 
-                style={{ position: 'absolute', top: 5, right: 5 }}
-                onClick={(e) => { e.stopPropagation(); handleRemoveFile('school_detail'); }}
-              >
-                删除
-              </Button>
-            )}
-          </div>
+          <Dragger
+            accept=".xlsx,.xls"
+            beforeUpload={(file) => { handleFileChange('school_detail', { file }); return false }}
+            onRemove={() => handleRemoveFile('school_detail')}
+            showUploadList={files.school_detail ? { showRemoveIcon: true } : false}
+            fileList={files.school_detail ? [{ uid: '3', name: files.school_detail.name, status: 'done' }] : []}
+          >
+            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
+            <p>3.累计单校情况</p>
+            {!files.school_detail && <p style={{ color: '#999', fontSize: 12 }}>点击或拖拽上传</p>}
+          </Dragger>
           
-          <div style={{ position: 'relative' }}>
-            <Dragger
-              accept=".xlsx,.xls"
-              beforeUpload={(file) => { handleFileChange('hive_data', { file }); return false }}
-              showUploadList={false}
-            >
-              <p><InboxOutlined style={{ fontSize: 32 }} /></p>
-              <p>4.蜂巢相关数据</p>
-              {files.hive_data && <p style={{ color: 'green' }}>✅ {files.hive_data.name}</p>}
-            </Dragger>
-            {files.hive_data && (
-              <Button 
-                size="small" 
-                danger 
-                style={{ position: 'absolute', top: 5, right: 5 }}
-                onClick={(e) => { e.stopPropagation(); handleRemoveFile('hive_data'); }}
-              >
-                删除
-              </Button>
-            )}
-          </div>
+          <Dragger
+            accept=".xlsx,.xls"
+            beforeUpload={(file) => { handleFileChange('hive_data', { file }); return false }}
+            onRemove={() => handleRemoveFile('hive_data')}
+            showUploadList={files.hive_data ? { showRemoveIcon: true } : false}
+            fileList={files.hive_data ? [{ uid: '4', name: files.hive_data.name, status: 'done' }] : []}
+          >
+            <p><InboxOutlined style={{ fontSize: 32 }} /></p>
+            <p>4.蜂巢相关数据</p>
+            {!files.hive_data && <p style={{ color: '#999', fontSize: 12 }}>点击或拖拽上传</p>}
+          </Dragger>
         </div>
         
         <div style={{ marginTop: 16, textAlign: 'center' }}>
