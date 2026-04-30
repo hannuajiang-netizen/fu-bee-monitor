@@ -386,9 +386,13 @@ def generate_weekly_report(df_user: pd.DataFrame, df_content: pd.DataFrame,
     if has_school:
         # 计算本周和上周的高校数
         if '日期' in df_school.columns:
-            this_week_school = df_school[df_school['日期'] >= (df_school['日期'].max() - pd.Timedelta(days=6))]
-            last_week_school = df_school[(df_school['日期'] >= (df_school['日期'].max() - pd.Timedelta(days=13))) & 
-                                        (df_school['日期'] < (df_school['日期'].max() - pd.Timedelta(days=6)))]
+            # 确保日期列是 datetime 类型
+            if not pd.api.types.is_datetime64_any_dtype(df_school['日期']):
+                df_school['日期'] = pd.to_datetime(df_school['日期'])
+            latest_date = df_school['日期'].max()
+            this_week_school = df_school[df_school['日期'] >= (latest_date - pd.Timedelta(days=6))]
+            last_week_school = df_school[(df_school['日期'] >= (latest_date - pd.Timedelta(days=13))) & 
+                                        (df_school['日期'] < (latest_date - pd.Timedelta(days=6)))]
             this_school_count = calculate_school_count(this_week_school)
             last_school_count = calculate_school_count(last_week_school)
         else:
