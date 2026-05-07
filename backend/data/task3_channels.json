@@ -1,0 +1,336 @@
+{
+  "channels": [
+    {
+      "is_default": true,
+      "name": "userteam_26H1社团活动-专"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_26年H1拉新-李（社团、职引、AI）"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_26年H1拉新-左1"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_12月公益任务页面-芙"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_26年H1拉新-左3"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_26H1通用社团活动"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_26年H1拉新-左2"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_26年H1拉新-左4"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_社团活动拉新用户分组"
+    },
+    {
+      "is_default": true,
+      "name": "act_white_社团活动"
+    },
+    {
+      "is_default": true,
+      "name": "group_校园社团进群"
+    },
+    {
+      "is_default": true,
+      "name": "search_社团活动"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_社团入驻邀请-高"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_校园合作-观看视频流程"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_社团活动拉新用户分组-信息收集"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_社团功能-文联"
+    },
+    {
+      "is_default": true,
+      "name": "userteam_12月公益任务页面—左3"
+    },
+    {
+      "is_default": true,
+      "name": "group_创意星球-河北工艺美术职业学院"
+    },
+    {
+      "is_default": true,
+      "name": "group_创意星球-广东科学技术职业学院"
+    },
+    {
+      "name": "search_求职内推小红书投放3",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_cat",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "用户自传播",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_流浪猫猫协白名单",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_喵探活动白名单",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "act_white_送卡牌活动",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_老师榜回流",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_rank",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_小蜜蜂内推官",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_求职内推抖音投放",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_派单平台外宣",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_rank_teacher",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_26年H1拉新-左5",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "invitation_code",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_网易小蜜蜂&清华研究生院5院迎新季(网易号活动9.22~9.30）",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_求职内推搜索",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_书暖童心·冬日传情 XY组",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "act_white_流浪猫活动",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_求职内推-抖盟2",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_求职内推-抖盟3",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_offer蜂收站",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_求职内推-抖盟",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "act_white_小蜜蜂公益捐书活动",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_MBTI活动回流",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_校园流量主",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_秋招活动学校拉新3组",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_packet",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_榜单回流",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_mbti",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_网易云&小蜜蜂",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_求职内推小红书投放",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_公益社团",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_校园模块搜索",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_求职内推小红书投放2",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "group_求职拉新入群",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_友利特色垂类拉新",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_韩维辰星猫",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_26春季职场内推2",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_云音乐x小蜜蜂",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_金善禹星猫",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_申惟星猫",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_共建大使拉新（评分笔记、百科、榜单）",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "act_white_网易小蜜蜂x云音乐",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_dada合作",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "group_求职拉新入群-秋招投递",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_流浪猫活动回流",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "search_金善旴星猫",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_校园反诈活动-1组",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "act_white_拼豆春节赢红包",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_秋招活动",
+      "is_default": false,
+      "is_new": true
+    },
+    {
+      "name": "userteam_小蜜蜂学院奖",
+      "is_default": false,
+      "is_new": true
+    }
+  ],
+  "updated_at": "2026-05-06T07:18:01.541036"
+}
